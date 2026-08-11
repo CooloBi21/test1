@@ -1,0 +1,19 @@
+.chart-wrapper {
+    width: 90%;
+    max-width: 1200px;
+
+    margin: 40px auto;
+}
+
+.chart-wrapper h1 {
+    margin-bottom: 20px;
+
+    font-size: 24px;
+}
+
+.chart-container {
+    width: 100%;
+    height: 500px;
+
+    border: 1px solid #ddd;
+}

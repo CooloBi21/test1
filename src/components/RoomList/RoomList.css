@@ -1,0 +1,19 @@
+.room-list {
+    width: 100%;
+}
+
+.no-result {
+    width: 100%;
+
+    padding: 40px 20px;
+
+    border: 1px solid #ddd;
+
+    text-align: center;
+
+    color: #777;
+
+    background-color: #fafafa;
+
+    font-size: 17px;
+}
