@@ -1,126 +1,246 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import Filter from "./components/Filter/Filter";
 import RoomList from "./components/RoomList/RoomList";
 import CandleStickChart from "./components/CandleStickChart/CandleStickChart";
 
-import roomsData from "./data/room.json";
-import provincesData from "./data/tinh_tp.json";
-import districtsData from "./data/quan_huyen.json";
+import { getRooms } from "./api/roomApi";
+
+import {
+    getProvinces,
+    getDistricts
+} from "./api/locationApi";
 
 import "./App.css";
+
+const getResponseData = (response) =>
+  response?.data ?? response ?? [];
+
+const toLocationMap = (locations) => {
+  if (!Array.isArray(locations)) {
+    return locations;
+  }
+
+  return locations.reduce((result, location) => {
+    result[location.code] = {
+      ...location,
+      name_with_type:
+        location.name_with_type ?? location.name,
+    };
+
+    return result;
+  }, {});
+};
 
 function App() {
    // =========================
   // STATE - BÀI 1
   // =========================
 
-  const [selectedCity, setSelectedCity] = useState("");
+const [selectedCity, setSelectedCity] = useState("");
 
-  const [selectedDistrict, setSelectedDistrict] = useState("");
+const [selectedDistrict, setSelectedDistrict] = useState("");
 
-  const [selectedPrice, setSelectedPrice] = useState("");
+const [selectedPrice, setSelectedPrice] = useState("");
 
-  const [selectedArea, setSelectedArea] = useState("");
+const [selectedArea, setSelectedArea] = useState("");
 
-  const [rooms, setRooms] = useState(roomsData);
+
+// Danh sách phòng lấy từ Backend
+const [rooms, setRooms] = useState([]);
+
+
+// Danh sách tỉnh lấy từ Backend
+const [provinces, setProvinces] = useState([]);
+
+
+// Danh sách quận/huyện lấy từ Backend
+const [districts, setDistricts] = useState([]);
+
+
+// Trạng thái loading
+const [loading, setLoading] = useState(false);
+
+// Trạng thái lỗi
+const [error, setError] = useState("");
+
+// ==================================================
+// LOAD DỮ LIỆU BAN ĐẦU
+// ==================================================
+
+const loadInitialData = useCallback(async () => {
+
+    try {
+
+        setLoading(true);
+        setError("");
+
+        const [
+            roomResponse,
+            provinceResponse,
+            districtResponse
+        ] = await Promise.all([
+            getRooms(),
+            getProvinces(),
+            getDistricts()
+        ]);
+
+        setRooms(getResponseData(roomResponse));
+        setProvinces(
+            toLocationMap(getResponseData(provinceResponse))
+        );
+        setDistricts(
+            toLocationMap(getResponseData(districtResponse))
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        setError(
+            "Không thể kết nối tới Backend"
+        );
+
+    } finally {
+
+        setLoading(false);
+
+    }
+}, []);
+
+useEffect(() => {
+
+    const timeoutId = setTimeout(() => {
+        loadInitialData();
+    }, 0);
+
+    return () => {
+        clearTimeout(timeoutId);
+    };
+
+}, [loadInitialData]);
 
 
   // =========================
   // CHỌN TỈNH / THÀNH
   // =========================
 
-  const handleCityChange = (cityCode) => {
+  const handleCityChange = async (cityCode) => {
+
     setSelectedCity(cityCode);
 
-    // Khi đổi tỉnh thì reset quận/huyện
     setSelectedDistrict("");
-  };
+
+    if (!cityCode) {
+
+        return;
+
+    }
+
+    try {
+
+        const response =
+            await getDistricts(cityCode);
+
+        setDistricts(
+            toLocationMap(getResponseData(response))
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+};
 
 
   // =========================
   // LỌC PHÒNG
   // =========================
 
-  const handleFilter = () => {
-    let result = roomsData;
+  const handleFilter = async () => {
 
+    try {
 
-    // -------------------------
-    // Lọc theo tỉnh
-    // -------------------------
+        setLoading(true);
+        setError("");
 
-    if (selectedCity) {
-      result = result.filter(
-        (room) =>
-          String(room.city) === String(selectedCity)
-      );
+        const params = {};
+
+        if (selectedCity) {
+            params.city = selectedCity;
+        }
+
+        if (selectedDistrict) {
+            params.district = selectedDistrict;
+        }
+
+        if (selectedPrice) {
+
+            const [min, max] =
+                selectedPrice.split("-");
+
+            params.minPrice = min;
+            params.maxPrice = max;
+
+        }
+
+        if (selectedArea) {
+
+            const [min, max] =
+                selectedArea.split("-");
+
+            params.minArea = min;
+            params.maxArea = max;
+
+        }
+
+        const response =
+            await getRooms(params);
+
+        setRooms(getResponseData(response));
+
+    } catch (error) {
+
+        console.error(error);
+
+        setError(
+            "Không thể lọc danh sách phòng"
+        );
+
+    } finally {
+
+        setLoading(false);
+
     }
 
-
-    // -------------------------
-    // Lọc theo quận/huyện
-    // -------------------------
-
-    if (selectedDistrict) {
-      result = result.filter(
-        (room) =>
-          String(room.district) ===
-          String(selectedDistrict)
-      );
-    }
-
-
-    // -------------------------
-    // Lọc theo giá
-    // -------------------------
-
-    if (selectedPrice) {
-      const [min, max] =
-        selectedPrice.split("-").map(Number);
-
-      result = result.filter(
-        (room) =>
-          Number(room.price) >= min &&
-          Number(room.price) <= max
-      );
-    }
-
-
-    // -------------------------
-    // Lọc theo diện tích
-    // -------------------------
-
-    if (selectedArea) {
-      const [min, max] =
-        selectedArea.split("-").map(Number);
-
-      result = result.filter(
-        (room) =>
-          Number(room.area) >= min &&
-          Number(room.area) <= max
-      );
-    }
-
-
-    // Cập nhật danh sách
-    setRooms(result);
-  };
+};
 
 
   // =========================
   // RESET FILTER
   // =========================
-
-  const handleReset = () => {
+const handleReset = async () => {
     setSelectedCity("");
     setSelectedDistrict("");
     setSelectedPrice("");
     setSelectedArea("");
 
-    setRooms(roomsData);
-  };
+    try {
+        setLoading(true);
 
+        const response = await getRooms();
+
+        setRooms(response.data);
+
+    } catch (error) {
+        console.error(error);
+        setError("Không thể tải lại danh sách phòng.");
+    } finally {
+        setLoading(false);
+    }
+};
 
   // =========================
   // GIAO DIỆN
@@ -174,8 +294,8 @@ function App() {
           {/* FILTER */}
 
           <Filter
-            provinces={provincesData}
-            districts={districtsData}
+            provinces={provinces}
+            districts={districts}
 
             selectedCity={selectedCity}
             selectedDistrict={selectedDistrict}
@@ -196,7 +316,13 @@ function App() {
           <div className="result-toolbar">
 
             <span>
-              Tìm thấy{" "}<strong>{rooms.length}</strong>{" "} phòng
+              {loading
+                ? "Đang tải danh sách phòng..."
+                : (
+                  <>
+                    Tìm thấy{" "}<strong>{rooms.length}</strong>{" "} phòng
+                  </>
+                )}
             </span>
 
             <button
@@ -208,13 +334,19 @@ function App() {
 
           </div>
 
+          {error && (
+            <div className="no-result">
+              {error}
+            </div>
+          )}
+
 
           {/* DANH SÁCH PHÒNG */}
 
           <RoomList
             rooms={rooms}
-            provinces={provincesData}
-            districts={districtsData}
+            provinces={provinces}
+            districts={districts}
           />
 
         </main>
