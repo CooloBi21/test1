@@ -1,31 +1,25 @@
-const API_URL = "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "https://test1-be-845w.onrender.com";
 
 export const getProvinces = async () => {
-
     const response = await fetch(
-        `${API_URL}/provinces`
+        `${API_URL}/api/provinces`
     );
 
     if (!response.ok) {
-        throw new Error("Không thể lấy danh sách tỉnh");
+        throw new Error("Không thể lấy tỉnh/thành");
     }
 
     return response.json();
 };
 
 
-export const getDistricts = async (parentCode = "") => {
-
-    const query = parentCode
-        ? `?parent_code=${parentCode}`
-        : "";
-
+export const getDistricts = async () => {
     const response = await fetch(
-        `${API_URL}/districts${query}`
+        `${API_URL}/api/districts`
     );
 
     if (!response.ok) {
-        throw new Error("Không thể lấy danh sách quận/huyện");
+        throw new Error("Không thể lấy quận/huyện");
     }
 
     return response.json();
