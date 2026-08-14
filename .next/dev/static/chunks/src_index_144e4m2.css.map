@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["file:///D:/VisualStudioCode/Projects/LeNguyenHoang/phong-tro-web/src/index.css"],"sourcesContent":["* {\n  box-sizing: border-box;\n}\n\nhtml,\nbody {\n  margin: 0;\n\n  padding: 0;\n\n  font-family:\n    Arial,\n    Helvetica,\n    sans-serif;\n\n  background-color: white;\n}\n\nbutton,\nselect {\n  font-family: inherit;\n}"],"names":[],"mappings":"AAAA;;;;AAIA;;;;;;;AAcA"}}]
-}
