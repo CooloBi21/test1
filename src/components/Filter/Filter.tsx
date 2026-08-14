@@ -5,20 +5,19 @@ import "./Filter.css";
 // 1. KHAI BÁO KIỂU DỮ LIỆU 
 // ==========================================
 
-// Kiểu dữ liệu từng Tỉnh/Thành
 export interface ProvinceItem {
   code: string | number;
-  name_with_type: string;
+  name?: string;
+  name_with_type?: string;
 }
 
-// Kiểu dữ liệu từng Quận/Huyện
 export interface DistrictItem {
   code: string | number;
-  name_with_type: string;
+  name?: string;
+  name_with_type?: string;
   parent_code: string | number;
 }
 
-// Kiểu dữ liệu cho toàn bộ Props nhận từ Component cha
 interface FilterProps {
   provinces: Record<string, ProvinceItem> | ProvinceItem[];
   districts: Record<string, DistrictItem> | DistrictItem[];
@@ -50,8 +49,22 @@ const Filter: React.FC<FilterProps> = ({
   onAreaChange,
   onFilter,
 }) => {
-  // Lọc danh sách Quận/Huyện dựa trên Tỉnh/Thành được chọn
-  const districtList = (Object.values(districts) as DistrictItem[]).filter(
+  // 1. Chuyển đổi provinces an toàn
+  const provinceList: ProvinceItem[] = provinces
+    ? Array.isArray(provinces)
+      ? provinces
+      : Object.values(provinces)
+    : [];
+
+  // 2. Chuyển đổi districts an toàn 
+  const rawDistricts: DistrictItem[] = districts
+    ? Array.isArray(districts)
+      ? districts
+      : Object.values(districts)
+    : [];
+
+  // 3. Lọc danh sách Quận/Huyện dựa trên Tỉnh/Thành được chọn
+  const districtList = rawDistricts.filter(
     (district) => String(district.parent_code) === String(selectedCity)
   );
 
@@ -62,16 +75,14 @@ const Filter: React.FC<FilterProps> = ({
         {/* Tỉnh thành */}
         <div className="filter-item">
           <label>Tỉnh thành</label>
-
           <select
             value={selectedCity}
             onChange={(event) => onCityChange(event.target.value)}
           >
             <option value="">---Tỉnh thành---</option>
-
-            {(Object.values(provinces) as ProvinceItem[]).map((province) => (
+            {provinceList.map((province) => (
               <option key={province.code} value={province.code}>
-                {province.name_with_type}
+                {province.name_with_type || province.name}
               </option>
             ))}
           </select>
@@ -80,19 +91,16 @@ const Filter: React.FC<FilterProps> = ({
         {/* Quận huyện */}
         <div className="filter-item">
           <label>Quận huyện</label>
-
           <select
             value={selectedDistrict}
             onChange={(event) => onDistrictChange(event.target.value)}
             disabled={!selectedCity}
           >
             <option value="">---Quận huyện---</option>
-
             {districtList.map((district) => (
               <option key={district.code} value={district.code}>
-                {district.name_with_type}
+                {district.name_with_type || district.name}
               </option>
-
             ))}
           </select>
         </div>
@@ -100,7 +108,6 @@ const Filter: React.FC<FilterProps> = ({
         {/* Khoảng giá */}
         <div className="filter-item">
           <label>Khoảng giá</label>
-
           <select
             value={selectedPrice}
             onChange={(event) => onPriceChange(event.target.value)}
@@ -116,7 +123,6 @@ const Filter: React.FC<FilterProps> = ({
         {/* Diện tích */}
         <div className="filter-item">
           <label>Diện tích</label>
-
           <select
             value={selectedArea}
             onChange={(event) => onAreaChange(event.target.value)}

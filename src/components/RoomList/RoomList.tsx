@@ -3,75 +3,73 @@ import RoomCard, { RoomItem } from "../RoomCard/RoomCard";
 import { ProvinceItem, DistrictItem } from "../Filter/Filter";
 import "./RoomList.css";
 
-// ==========================================
-// 1. KHAI BÁO KIỂU DỮ LIỆU 
-// ==========================================
-
 export interface RoomWithLocation extends RoomItem {
   city?: string | number;
   district?: string | number;
 }
 
-// Định nghĩa kiểu dữ liệu cho Props của RoomList
 interface RoomListProps {
   rooms: RoomWithLocation[];
-  provinces: Record<string | number, ProvinceItem>;
-  districts: Record<string | number, DistrictItem>;
+  provinces?: Record<string, ProvinceItem> | ProvinceItem[];
+  districts?: Record<string, DistrictItem> | DistrictItem[];
 }
 
-// ==========================================
-// 2. COMPONENT ROOMLIST VỚI TYPESCRIPT
-// ==========================================
-
 const RoomList: React.FC<RoomListProps> = ({
-  rooms,
-  provinces,
-  districts,
+  rooms = [],
+  provinces = [],
+  districts = [],
 }) => {
-  // Tìm tên tỉnh/thành
+  // Hàm tìm tên Tỉnh/Thành an toàn
   const getProvinceName = (cityCode?: string | number): string => {
-    if (!cityCode) return "Không xác định";
+    if (!cityCode || !provinces) return "Không xác định";
+
+    // Trường hợp provinces là Mảng
+    if (Array.isArray(provinces)) {
+      const found = provinces.find((p) => String(p.code) === String(cityCode));
+      return found?.name_with_type || found?.name || "Không xác định";
+    }
+
+    // Trường hợp provinces là Object
     const province = provinces[cityCode];
-
-    if (!province) {
-      return "Không xác định";
-    }
-
-    return province.name_with_type;
+    return province?.name_with_type || province?.name || "Không xác định";
   };
 
-  // Tìm tên quận/huyện
+  // Hàm tìm tên Quận/Huyện an toàn
   const getDistrictName = (districtCode?: string | number): string => {
-    if (!districtCode) return "Không xác định";
-    const district = districts[districtCode];
+    if (!districtCode || !districts) return "Không xác định";
 
-    if (!district) {
-      return "Không xác định";
+    // Trường hợp districts là Mảng
+    if (Array.isArray(districts)) {
+      const found = districts.find((d) => String(d.code) === String(districtCode));
+      return found?.name_with_type || found?.name || "Không xác định";
     }
 
-    return district.name_with_type;
+    // Trường hợp districts là Object
+    const district = districts[districtCode];
+    return district?.name_with_type || district?.name || "Không xác định";
   };
 
-  // Không có kết quả
   if (!rooms || rooms.length === 0) {
     return (
-      <div className="no-result">
-        Không tìm thấy phòng trọ phù hợp.
+      <div className="no-rooms">
+        <p>Không tìm thấy phòng trọ nào phù hợp với tìm kiếm của bạn.</p>
       </div>
     );
   }
 
   return (
-    <section className="room-list">
-      {rooms.map((room, index) => (
-        <RoomCard
-          key={`${room.district}-${index}`}
-          room={room}
-          cityName={getProvinceName(room.city)}
-          districtName={getDistrictName(room.district)}
-        />
-      ))}
-    </section>
+    <div className="room-list-container">
+      <div className="room-grid">
+        {rooms.map((room) => (
+          <RoomCard
+            key={room.id}
+            room={room}
+            cityName={getProvinceName(room.city || room.province_code)}
+            districtName={getDistrictName(room.district || room.district_code)}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 

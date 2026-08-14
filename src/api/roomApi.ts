@@ -3,15 +3,16 @@ import { RoomWithLocation } from "../components/RoomList/RoomList";
 export interface RoomFilterParams {
   city?: string | number;
   district?: string | number;
-  price?: string;
-  area?: string;
-  [key: string]: string | number | undefined | null;
+  minPrice?: string | number;
+  maxPrice?: string | number;
+  minArea?: string | number;
+  maxArea?: string | number;
+  [key: string]: any;
 }
 
-// Lấy URL Backend từ biến môi trường
+// Cấu hình URL gọi tới NestJS Backend
 const API_URL: string =
-  (import.meta.env.VITE_API_URL as string) ||
-  "https://test1-be-845w.onrender.com";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 // ========================================
 // GET ROOMS
@@ -37,5 +38,8 @@ export const getRooms = async (
     throw new Error("Không thể lấy danh sách phòng");
   }
 
-  return response.json();
+  const result = await response.json();
+
+  // Đảm bảo tương thích: NestJS trả về { total, data: [...] }
+  return Array.isArray(result) ? result : result.data || [];
 };

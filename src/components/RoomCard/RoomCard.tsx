@@ -1,11 +1,11 @@
 import React from "react";
+import Link from "next/link"; // 1. Import Link từ next/link
 import "./RoomCard.css";
 
 // ==========================================
 // 1. KHAI BÁO KIỂU DỮ LIỆU 
 // ==========================================
 
-// Kiểu dữ liệu cho từng đối tượng Phòng trọ
 export interface RoomItem {
   id?: number | string;
   title: string;
@@ -17,7 +17,6 @@ export interface RoomItem {
   district_code?: string;
 }
 
-// Kiểu dữ liệu Props nhận từ RoomList
 interface RoomCardProps {
   room: RoomItem;
   cityName?: string;
@@ -25,7 +24,7 @@ interface RoomCardProps {
 }
 
 // ==========================================
-// 2. COMPONENT ROOMCARD VỚI TYPESCRIPT
+// 2. COMPONENT ROOMCARD CHUẨN NEXT.JS
 // ==========================================
 
 const RoomCard: React.FC<RoomCardProps> = ({
@@ -33,21 +32,30 @@ const RoomCard: React.FC<RoomCardProps> = ({
   cityName,
   districtName,
 }) => {
+  // Tạo đường dẫn động tới trang chi tiết phòng
+  const detailUrl = room.id ? `/rooms/${room.id}` : "#";
+
   return (
     <article className="room-card">
-      {/* Hình ảnh */}
+      {/* Hình ảnh - Bọc trong Link để click chuyển sang trang chi tiết */}
       <div className="room-image-wrapper">
-        <img
-          src={room.thumbnail || "https://via.placeholder.com/300x200?text=No+Image"}
-          alt={room.title}
-          className="room-image"
-        />
+        <Link href={detailUrl}>
+          <img
+            src={room.thumbnail || "https://via.placeholder.com/300x200?text=No+Image"}
+            alt={room.title}
+            className="room-image"
+          />
+        </Link>
       </div>
 
       {/* Nội dung */}
       <div className="room-info">
-        {/* Tiêu đề */}
-        <h2 className="room-title">{room.title}</h2>
+        {/* Tiêu đề - Bọc trong Link */}
+        <h2 className="room-title">
+          <Link href={detailUrl} style={{ textDecoration: "none", color: "inherit" }}>
+            {room.title}
+          </Link>
+        </h2>
 
         {/* Giá */}
         <div className="room-price">

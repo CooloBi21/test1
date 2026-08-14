@@ -1,8 +1,7 @@
 import { ProvinceItem, DistrictItem } from "../components/Filter/Filter";
 
 const API_URL: string =
-  (import.meta.env.VITE_API_URL as string) ||
-  "https://test1-be-845w.onrender.com";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 // ========================================
 // GET PROVINCES
@@ -11,11 +10,11 @@ const API_URL: string =
 /**
  * Lấy danh sách Tỉnh/Thành
  */
-export const getProvinces = async (): Promise<Record<string, ProvinceItem>> => {
+export const getProvinces = async (): Promise<ProvinceItem[]> => {
   const response = await fetch(`${API_URL}/api/provinces`);
 
   if (!response.ok) {
-    throw new Error("Không thể lấy tỉnh/thành");
+    throw new Error("Không thể lấy danh sách tỉnh/thành");
   }
 
   return response.json();
@@ -26,24 +25,30 @@ export const getProvinces = async (): Promise<Record<string, ProvinceItem>> => {
 // ========================================
 
 /**
- * Lấy danh sách Quận/Huyện (có thể lọc theo Mã Tỉnh/Thành)
+ * Lấy tất cả danh sách Quận/Huyện
  */
-export const getDistricts = async (
-  parentCode: string | number | null = null
-): Promise<Record<string, DistrictItem>> => {
-  let url = `${API_URL}/api/districts`;
-
-  // Nếu có tỉnh được chọn
-  if (parentCode) {
-    url = `${API_URL}/api/districts/by-province?parentCode=${encodeURIComponent(
-      String(parentCode)
-    )}`;
-  }
-
-  const response = await fetch(url);
+export const getDistricts = async (): Promise<DistrictItem[]> => {
+  const response = await fetch(`${API_URL}/api/districts`);
 
   if (!response.ok) {
-    throw new Error("Không thể lấy quận/huyện");
+    throw new Error("Không thể lấy danh sách tất cả quận/huyện");
+  }
+
+  return response.json();
+};
+
+/**
+ * Lấy danh sách Quận/Huyện theo Mã Tỉnh
+ */
+export const getDistrictsByProvince = async (parentCode: string): Promise<DistrictItem[]> => {
+  if (!parentCode) return [];
+
+  const response = await fetch(
+    `${API_URL}/api/districts/by-province?parentCode=${parentCode}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Lỗi khi lấy danh sách quận/huyện theo tỉnh/thành");
   }
 
   return response.json();
