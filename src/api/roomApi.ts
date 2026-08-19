@@ -258,7 +258,7 @@ export const deleteReview = async (reviewId: number, token?: string): Promise<vo
 };
 
 /* ==========================================================================
-   5. ĐĂNG TIN PHÒNG TRỌ (CREATE ROOM)
+   5. ĐĂNG, CẬP NHẬT VÀ XÓA TIN PHÒNG TRỌ (POST / PUT / DELETE ROOM)
    ========================================================================== */
 
 export const createRoomPost = async (roomData: any, token?: string): Promise<any> => {
@@ -279,8 +279,47 @@ export const createRoomPost = async (roomData: any, token?: string): Promise<any
   return response.json();
 };
 
-// Alias đặt lại tên hàm hỗ trợ trường hợp import { createRoom } ở các file cũ
-export const createRoom = createRoomPost;
+export const updateRoomPost = async (
+  roomId: number | string,
+  roomData: any,
+  token?: string
+): Promise<any> => {
+  const jwt = getToken(token);
+  if (!jwt) throw new Error('Vui lòng đăng nhập để cập nhật bài đăng');
+
+  const response = await fetch(`${API_URL}/api/rooms/${roomId}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(jwt),
+    body: JSON.stringify(roomData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Cập nhật tin đăng thất bại.');
+  }
+
+  return response.json();
+};
+
+export const deleteRoomPost = async (
+  roomId: number | string,
+  token?: string
+): Promise<any> => {
+  const jwt = getToken(token);
+  if (!jwt) throw new Error('Vui lòng đăng nhập để xóa bài đăng');
+
+  const response = await fetch(`${API_URL}/api/rooms/${roomId}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(jwt),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Xóa tin đăng thất bại.');
+  }
+
+  return response.json();
+};
 
 export const getMyRooms = async (token?: string): Promise<Room[]> => {
   const jwt = getToken(token);
@@ -300,3 +339,8 @@ export const getMyRooms = async (token?: string): Promise<Room[]> => {
     return [];
   }
 };
+
+// Aliases hỗ trợ linh hoạt cho các tên gọi hàm khác nhau
+export const createRoom = createRoomPost;
+export const updateRoom = updateRoomPost;
+export const deleteRoom = deleteRoomPost;

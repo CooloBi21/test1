@@ -4,6 +4,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { SavedPostsProvider } from '@/context/SavedPostsContext';
 import Navbar from '@/components/Navbar/Navbar';
 import { ChatProvider } from '@/context/ChatContext';
+import { NotificationProvider } from '@/context/NotificationContext';
 
 export const metadata: Metadata = {
   title: 'Hệ Thống Tìm Trọ & Phòng Cho Thuê',
@@ -20,12 +21,14 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           {}
-          <ChatProvider>
-            <SavedPostsProvider>
-              <Navbar />
-              <main>{children}</main>
-            </SavedPostsProvider>
-          </ChatProvider>
+          <NotificationProvider>
+            <ChatProvider>
+              <SavedPostsProvider>
+                <Navbar />
+                <main>{children}</main>
+              </SavedPostsProvider>
+            </ChatProvider>
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>

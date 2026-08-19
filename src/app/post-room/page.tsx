@@ -83,7 +83,7 @@ export default function PostRoomPage() {
       setIsSubmitting(true);
       
       const fullContent = formData.addressLine 
-        ? `📍 Địa chỉ chi tiết: ${formData.addressLine}\n\n${formData.content}`
+        ? `📍${formData.addressLine}\n\n${formData.content}`
         : formData.content;
 
       const payload = {

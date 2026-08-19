@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { getRoomById, recordRoomView } from '@/api/roomApi';
 import { createOrGetConversation } from '@/api/chatApi';
 import { useAuth } from '@/context/AuthContext';
 import { useSavedPosts } from '@/context/SavedPostsContext';
-import { Heart, MessageCircle, MapPin, Square, ShieldCheck } from 'lucide-react';
+import { Heart, MessageCircle, MapPin, ShieldCheck, Edit3 } from 'lucide-react';
 
 export default function RoomDetailPage() {
   const params = useParams();
@@ -19,7 +20,7 @@ export default function RoomDetailPage() {
   const [submittingChat, setSubmittingChat] = useState(false);
   const numericRoomId = Number(params?.id);
 
-  // Cờ đánh dấu để chống ghi nhận 2 lần trong Strict Mode
+  // Cờ đánh dấu để chống ghi nhận lượt xem 2 lần trong React Strict Mode
   const hasRecordedRef = useRef(false);
 
   useEffect(() => {
@@ -29,13 +30,13 @@ export default function RoomDetailPage() {
       .then((data) => {
         setRoom(data);
 
-        // Chỉ ghi nhận lượt xem 1 lần duy nhất cho mỗi lượt render trang
+        // Ghi nhận lượt xem 1 lần duy nhất
         if (data && !hasRecordedRef.current) {
           hasRecordedRef.current = true;
           recordRoomView(numericRoomId);
         }
       })
-      .catch((err) => console.error(err))
+      .catch((err) => console.error('Lỗi lấy thông tin phòng:', err))
       .finally(() => setLoading(false));
   }, [numericRoomId]);
 
@@ -66,62 +67,116 @@ export default function RoomDetailPage() {
   if (!room) return <div style={{ padding: '40px', textAlign: 'center' }}>Phòng trọ không tồn tại.</div>;
 
   const isRoomSaved = isSaved(numericRoomId);
+  const isOwner = user?.id === room.user_id;
 
   return (
     <div style={{ maxWidth: '1100px', margin: '20px auto', padding: '0 16px', display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
       {/* CỘT TRÁI: CHI TIẾT */}
       <div>
-        <img src={room.thumbnail || 'https://via.placeholder.com/800x450'} alt={room.title} style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: '12px' }} />
+        <img
+          src={room.thumbnail || 'https://via.placeholder.com/800x450'}
+          alt={room.title}
+          style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: '12px' }}
+        />
         <h1 style={{ fontSize: '24px', fontWeight: 800, margin: '16px 0 8px' }}>{room.title}</h1>
         <p style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <MapPin size={16} /> {room.district_name}, {room.city_name}
+          <MapPin size={16} /> {room.district_name || room.district || 'N/A'}, {room.city_name || room.city || 'N/A'}
         </p>
         <div style={{ display: 'flex', gap: '20px', margin: '16px 0', padding: '12px', background: '#f8fafc', borderRadius: '8px' }}>
-          <div><span style={{ color: '#64748b', fontSize: '12px' }}>Giá thuê</span><p style={{ color: '#ea580c', fontWeight: 800, fontSize: '18px', margin: 0 }}>{Number(room.price).toLocaleString('vi-VN')} đ/tháng</p></div>
-          <div><span style={{ color: '#64748b', fontSize: '12px' }}>Diện tích</span><p style={{ fontWeight: 700, fontSize: '18px', margin: 0 }}>{room.area} m²</p></div>
+          <div>
+            <span style={{ color: '#64748b', fontSize: '12px' }}>Giá thuê</span>
+            <p style={{ color: '#ea580c', fontWeight: 800, fontSize: '18px', margin: 0 }}>
+              {Number(room.price).toLocaleString('vi-VN')} đ/tháng
+            </p>
+          </div>
+          <div>
+            <span style={{ color: '#64748b', fontSize: '12px' }}>Diện tích</span>
+            <p style={{ fontWeight: 700, fontSize: '18px', margin: 0 }}>{room.area} m²</p>
+          </div>
         </div>
         <h3>Mô tả chi tiết</h3>
-        <p style={{ lineHeight: '1.6', color: '#334155' }}>{room.content || 'Chưa có mô tả chi tiết.'}</p>
+        <p style={{ lineHeight: '1.6', color: '#334155', whiteSpace: 'pre-line' }}>{room.content || 'Chưa có mô tả chi tiết.'}</p>
       </div>
 
-      {/* CỘT PHẢI: THÔNG TIN CHỦ NHÀ & LIÊN HỆ */}
+      {/* CỘT PHẢI: THÔNG TIN CHỦ NHÀ & THAO TÁC */}
       <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', height: 'fit-content' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
-            {room.user?.full_name?.charAt(0) || 'CN'}
+          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '18px' }}>
+            {room.user?.full_name?.charAt(0).toUpperCase() || 'CN'}
           </div>
           <div>
             <h4 style={{ margin: 0, fontWeight: 700 }}>{room.user?.full_name || 'Chủ bài đăng'}</h4>
-            <span style={{ fontSize: '12px', color: '#16a34a', display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={14} /> Chính chủ đã xác thực</span>
+            <span style={{ fontSize: '12px', color: '#16a34a', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <ShieldCheck size={14} /> Chính chủ đã xác thực
+            </span>
           </div>
         </div>
 
+        {/* Nếu người xem chính là chủ sở hữu, hiện thêm nút sửa nhanh */}
+        {isOwner ? (
+          <Link
+            href={`/rooms/${room.id}/edit`}
+            style={{
+              width: '100%',
+              background: '#fef3c7',
+              color: '#b45309',
+              border: 'none',
+              padding: '12px',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '15px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              textDecoration: 'none',
+              marginBottom: '10px'
+            }}
+          >
+            <Edit3 size={18} /> Chỉnh sửa tin đăng này
+          </Link>
+        ) : (
+          <button
+            onClick={handleContactLandlord}
+            disabled={submittingChat}
+            style={{
+              width: '100%',
+              background: submittingChat ? '#93c5fd' : '#2563eb',
+              color: '#fff',
+              border: 'none',
+              padding: '12px',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '15px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: submittingChat ? 'not-allowed' : 'pointer',
+              marginBottom: '10px'
+            }}
+          >
+            <MessageCircle size={18} /> {submittingChat ? 'Đang kết nối...' : 'Chat với chủ nhà'}
+          </button>
+        )}
+
         <button
-          onClick={handleContactLandlord}
-          disabled={submittingChat}
+          onClick={() => toggleSavePost(room)}
           style={{
             width: '100%',
-            background: submittingChat ? '#93c5fd' : '#2563eb',
-            color: '#fff',
+            background: isRoomSaved ? '#fee2e2' : '#f1f5f9',
+            color: isRoomSaved ? '#dc2626' : '#475569',
             border: 'none',
             padding: '12px',
             borderRadius: '8px',
-            fontWeight: 700,
-            fontSize: '15px',
+            fontWeight: 600,
+            fontSize: '14px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '8px',
-            cursor: submittingChat ? 'not-allowed' : 'pointer',
-            marginBottom: '10px'
+            cursor: 'pointer'
           }}
-        >
-          <MessageCircle size={18} /> {submittingChat ? 'Đang kết nối...' : '💬 Chat với chủ nhà'}
-        </button>
-
-        <button
-          onClick={() => toggleSavePost(room)}
-          style={{ width: '100%', background: isRoomSaved ? '#fee2e2' : '#f1f5f9', color: isRoomSaved ? '#dc2626' : '#475569', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 600, fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer' }}
         >
           <Heart size={18} fill={isRoomSaved ? '#dc2626' : 'none'} color={isRoomSaved ? '#dc2626' : '#475569'} />
           {isRoomSaved ? 'Đã lưu tin' : 'Lưu tin đăng'}

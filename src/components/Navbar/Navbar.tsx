@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useSavedPosts } from '@/context/SavedPostsContext';
 import { useChat } from '@/context/ChatContext';
+import { useNotifications } from '@/context/NotificationContext';
 import {
   Home,
   Heart,
@@ -30,7 +31,7 @@ export default function Navbar() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const navbarRef = useRef<HTMLDivElement>(null);
 
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const { notifications, unreadCount: unreadNotiCount, markAsRead, markAllAsRead } = useNotifications();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -65,7 +66,7 @@ export default function Navbar() {
         {/* NHÓM CHỨC NĂNG BÊN PHẢI */}
         <div className="navbar-actions">
 
-          {/* 1. ICON TRÁI TIM & DROPDOWN TIN ĐÃ LƯU */}
+          {/* 1. ICON & DROPDOWN TIN ĐÃ LƯU */}
           <div className="dropdown-wrapper">
             <button
               type="button"
@@ -124,7 +125,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* 2. ICON TIN NHẮN (CẬP NHẬT MỚI) */}
+          {/* 2. ICON TIN NHẮN */}
           <Link
             href="/chat"
             className="icon-btn"
@@ -150,8 +151,10 @@ export default function Navbar() {
               aria-label="Notifications"
             >
               <Bell className="w-5 h-5" />
-              {notifications.some(n => n.unread) && (
-                <span className="badge badge-orange badge-pulse" />
+              {unreadNotiCount > 0 && (
+                <span className="badge badge-orange badge-pulse">
+                  {unreadNotiCount > 99 ? '99+' : unreadNotiCount}
+                </span>
               )}
             </button>
 
@@ -159,8 +162,8 @@ export default function Navbar() {
               <div className="dropdown-menu dropdown-popover animate-fade-in">
                 <div className="popover-header">
                   <span className="font-bold text-gray-800">Thông báo</span>
-                  {notifications.length > 0 && (
-                    <button type="button" className="text-link-btn" onClick={() => setNotifications(notifications.map(n => ({...n, unread: false})))}>
+                  {unreadNotiCount > 0 && (
+                    <button type="button" className="text-link-btn" onClick={() => markAllAsRead()}>
                       Đánh dấu đã đọc
                     </button>
                   )}
@@ -168,14 +171,23 @@ export default function Navbar() {
                 <div className="popover-list">
                   {notifications.length > 0 ? (
                     notifications.map((item) => (
-                      <div key={item.id} className={`noti-item ${item.unread ? 'unread' : ''}`}>
+                      <div 
+                        key={item.id} 
+                        className={`noti-item ${!item.is_read ? 'unread' : ''}`}
+                        onClick={() => {
+                          if (!item.is_read) markAsRead(item.id);
+                          if (item.target_url) window.location.href = item.target_url;
+                          setActiveMenu(null);
+                        }}
+                        style={{ cursor: 'pointer' }}
+                      >
                         <div className="noti-icon">
-                          {item.type === 'discount' ? <Tag className="w-4 h-4 text-orange-500" /> : <CheckCircle2 className="w-4 h-4 text-green-500" />}
+                          {item.type === 'system' ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Bell className="w-4 h-4 text-orange-500" />}
                         </div>
                         <div className="noti-content">
                           <p className="noti-title">{item.title}</p>
-                          <p className="noti-desc">{item.desc}</p>
-                          <span className="noti-time">{item.time}</span>
+                          {item.body && <p className="noti-desc">{item.body}</p>}
+                          <span className="noti-time">{new Date(item.created_at).toLocaleDateString('vi-VN')}</span>
                         </div>
                       </div>
                     ))
