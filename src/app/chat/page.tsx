@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useChat } from '@/context/ChatContext';
 import { getConversations, getMessages, markAsRead } from '@/api/chatApi';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import styles from './chat.module.css';
 
 export default function ChatPage() {
@@ -99,7 +101,12 @@ export default function ChatPage() {
     <div className={styles.chatContainer}>
       {/* CỘT TRÁI: DANH SÁCH CUỘC TRÒ CHUYỆN */}
       <div className={styles.sidebar}>
-        <div className={styles.sidebarHeader}>Hộp thoại tin nhắn</div>
+        <div className={styles.sidebarHeader}>
+          <Link href="/" className={styles.homeButton}>
+            <ArrowLeft size={18} />
+          </Link>
+          <span>Hộp thoại tin nhắn</span>
+        </div>
         <div className={styles.conversationList}>
           {conversations.map((conv) => {
             const partner = conv.user_1_id === user.id ? conv.user2 : conv.user1;

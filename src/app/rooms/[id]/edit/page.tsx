@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getRoomById, updateRoomPost } from '@/api/roomApi';
+import { getDistrictsByProvince, getProvinces } from '@/api/locationApi';
 import { useAuth } from '@/context/AuthContext';
 import { ArrowLeft, Save } from 'lucide-react';
 import styles from './edit-room.module.css';
+import type { DistrictItem, ProvinceItem } from '@/components/Filter/Filter';
 
 type RoomFormData = {
   title: string;
@@ -35,6 +37,21 @@ export default function EditRoomPage() {
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [provinces, setProvinces] = useState<ProvinceItem[]>([]);
+  const [districts, setDistricts] = useState<DistrictItem[]>([]);
+
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const data = await getProvinces();
+        setProvinces(data || []);
+      } catch (error) {
+        console.error('Lỗi khi tải danh sách Tỉnh/Thành:', error);
+      }
+    };
+
+    fetchProvinces();
+  }, []);
 
   useEffect(() => {
     if (!roomId) return;
@@ -63,8 +80,8 @@ export default function EditRoomPage() {
           thumbnail: room.thumbnail || '',
           price: Number(room.price || 0),
           area: Number(room.area || 0),
-          city: String(room.city || room.city_name || ''),
-          district: String(room.district || room.district_name || ''),
+          city: String(room.province_code ?? room.city ?? ''),
+          district: String(room.district_code ?? room.district ?? ''),
           content: room.content || ''
         });
       } catch (error) {
@@ -81,11 +98,38 @@ export default function EditRoomPage() {
     }
   }, [roomId, user, router]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      if (!formData.city) {
+        setDistricts([]);
+        return;
+      }
+
+      try {
+        const data = await getDistrictsByProvince(formData.city);
+        setDistricts(data || []);
+      } catch (error) {
+        console.error('Lỗi khi tải danh sách Quận/Huyện:', error);
+        setDistricts([]);
+      }
+    };
+
+    fetchDistricts();
+  }, [formData.city]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: name === 'price' || name === 'area' ? Number(value) : value
+    }));
+  };
+
+  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      city: e.target.value,
+      district: ''
     }));
   };
 
@@ -106,131 +150,148 @@ export default function EditRoomPage() {
   };
 
   if (loading) {
-    return <div className="p-12 text-center text-gray-500 font-medium">Đang tải dữ liệu bài đăng...</div>;
+    return <div className={styles.loading}>Đang tải dữ liệu bài đăng...</div>;
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl border border-gray-200 shadow-sm my-8">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-        <h1 className="text-2xl font-bold text-gray-800">Chỉnh sửa bài đăng</h1>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <ArrowLeft size={16} /> Quay lại
-        </button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Tiêu đề bài đăng</label>
-          <input
-            required
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-            placeholder="Nhập tiêu đề phòng trọ..."
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Giá thuê (VNĐ/tháng)</label>
-            <input
-              required
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Diện tích (m²)</label>
-            <input
-              required
-              type="number"
-              name="area"
-              value={formData.area}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Thành phố / Tỉnh</label>
-            <input
-              required
-              type="text"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Quận / Huyện</label>
-            <input
-              required
-              type="text"
-              name="district"
-              value={formData.district}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">URL Ảnh Thumbnail</label>
-          <input
-            type="text"
-            name="thumbnail"
-            value={formData.thumbnail}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-            placeholder="https://example.com/image.jpg"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Nội dung mô tả chi tiết</label>
-          <textarea
-            required
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            rows={6}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
-            placeholder="Mô tả chi tiết phòng trọ..."
-          ></textarea>
-        </div>
-
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+    <main className={styles.page}>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Chỉnh sửa bài đăng</h1>
           <button
             type="button"
-            onClick={() => router.push('/profile')}
-            className="px-5 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+            onClick={() => router.back()}
+            className={styles.backButton}
           >
-            Hủy
-          </button>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="flex items-center gap-2 px-5 py-2.5 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors"
-          >
-            <Save size={18} />
-            {submitting ? 'Đang lưu...' : 'Lưu thay đổi'}
+            <ArrowLeft size={16} /> Quay lại
           </button>
         </div>
-      </form>
-    </div>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Tiêu đề bài đăng</label>
+            <input
+              required
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              className={styles.input}
+              placeholder="Nhập tiêu đề phòng trọ..."
+            />
+          </div>
+
+          <div className={styles.row}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Giá thuê (VNĐ/tháng)</label>
+              <input
+                required
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleChange}
+                className={styles.input}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Diện tích (m²)</label>
+              <input
+                required
+                type="number"
+                name="area"
+                value={formData.area}
+                onChange={handleChange}
+                className={styles.input}
+              />
+            </div>
+          </div>
+
+          <div className={styles.row}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Thành phố / Tỉnh</label>
+              <select
+                required
+                name="city"
+                value={formData.city}
+                onChange={handleCityChange}
+                className={styles.select}
+              >
+                <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                {provinces.map((province) => (
+                  <option key={province.code} value={String(province.code)}>
+                    {province.name_with_type || province.name || province.code}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Quận / Huyện</label>
+              <select
+                required
+                name="district"
+                value={formData.district}
+                onChange={handleChange}
+                className={styles.select}
+                disabled={!formData.city || districts.length === 0}
+              >
+                <option value="">
+                  {!formData.city ? '-- Chọn Tỉnh/Thành trước --' : '-- Chọn Quận/Huyện --'}
+                </option>
+                {districts.map((district) => (
+                  <option key={district.code} value={String(district.code)}>
+                    {district.name_with_type || district.name || district.code}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>URL Ảnh Thumbnail</label>
+            <input
+              type="text"
+              name="thumbnail"
+              value={formData.thumbnail}
+              onChange={handleChange}
+              className={styles.input}
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Nội dung mô tả chi tiết</label>
+            <textarea
+              required
+              name="content"
+              value={formData.content}
+              onChange={handleChange}
+              rows={6}
+              className={styles.textarea}
+              placeholder="Mô tả chi tiết phòng trọ..."
+            ></textarea>
+          </div>
+
+          <div className={styles.footer}>
+            <button
+              type="button"
+              onClick={() => router.push('/profile')}
+              className={styles.btnCancel}
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className={styles.btnSubmit}
+            >
+              <Save size={18} />
+              {submitting ? 'Đang lưu...' : 'Lưu thay đổi'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
   );
 }
