@@ -1,74 +1,153 @@
-import React from "react";
-import RoomCard, { RoomItem } from "../RoomCard/RoomCard";
-import { ProvinceItem, DistrictItem } from "../Filter/Filter";
-import "./RoomList.css";
+import React, { useState, useMemo } from 'react';
+import RoomCard from '../RoomCard/RoomCard';
+import { Room, Province, District, SortOption } from '@/types/room';
+import './RoomList.css';
 
-export interface RoomWithLocation extends RoomItem {
-  city?: string | number;
-  district?: string | number;
+export interface FilterTag {
+  key: string;
+  label: string;
 }
 
 interface RoomListProps {
-  rooms: RoomWithLocation[];
-  provinces?: Record<string, ProvinceItem> | ProvinceItem[];
-  districts?: Record<string, DistrictItem> | DistrictItem[];
+  rooms: Room[];
+  loading?: boolean;
+  provinces?: Record<string, any> | Province[];
+  districts?: Record<string, any> | District[];
+  activeTags?: FilterTag[];
+  onResetFilter?: () => void;
 }
 
 const RoomList: React.FC<RoomListProps> = ({
   rooms = [],
+  loading = false,
   provinces = [],
   districts = [],
+  activeTags = [],
+  onResetFilter,
 }) => {
-  // Hàm tìm tên Tỉnh/Thành an toàn
-  const getProvinceName = (cityCode?: string | number): string => {
-    if (!cityCode || !provinces) return "Không xác định";
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
 
-    // Trường hợp provinces là Mảng
+  const getProvinceName = (room: Room): string => {
+    if (room.city_name) return room.city_name;
+    const cityCode = room.city || room.province_code;
+    if (!cityCode || !provinces) return 'Không xác định';
+
     if (Array.isArray(provinces)) {
       const found = provinces.find((p) => String(p.code) === String(cityCode));
-      return found?.name_with_type || found?.name || "Không xác định";
+      return found?.name_with_type || found?.name || 'Không xác định';
     }
-
-    // Trường hợp provinces là Object
-    const province = provinces[cityCode];
-    return province?.name_with_type || province?.name || "Không xác định";
+    const province = (provinces as Record<string, any>)[cityCode];
+    return province?.name_with_type || province?.name || 'Không xác định';
   };
 
-  // Hàm tìm tên Quận/Huyện an toàn
-  const getDistrictName = (districtCode?: string | number): string => {
-    if (!districtCode || !districts) return "Không xác định";
+  const getDistrictName = (room: Room): string => {
+    if (room.district_name) return room.district_name;
+    const districtCode = room.district || room.district_code;
+    if (!districtCode || !districts) return 'Không xác định';
 
-    // Trường hợp districts là Mảng
     if (Array.isArray(districts)) {
       const found = districts.find((d) => String(d.code) === String(districtCode));
-      return found?.name_with_type || found?.name || "Không xác định";
+      return found?.name_with_type || found?.name || 'Không xác định';
     }
-
-    // Trường hợp districts là Object
-    const district = districts[districtCode];
-    return district?.name_with_type || district?.name || "Không xác định";
+    const district = (districts as Record<string, any>)[districtCode];
+    return district?.name_with_type || district?.name || 'Không xác định';
   };
 
-  if (!rooms || rooms.length === 0) {
-    return (
-      <div className="no-rooms">
-        <p>Không tìm thấy phòng trọ nào phù hợp với tìm kiếm của bạn.</p>
-      </div>
-    );
-  }
+  // Sắp xếp dữ liệu client-side mà không làm hỏng API
+  const sortedRooms = useMemo(() => {
+    const list = [...rooms];
+    switch (sortBy) {
+      case 'price-asc':
+        return list.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+      case 'price-desc':
+        return list.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+      case 'area-desc':
+        return list.sort((a, b) => Number(b.area || 0) - Number(a.area || 0));
+      case 'newest':
+      default:
+        return list.sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
+    }
+  }, [rooms, sortBy]);
 
   return (
     <div className="room-list-container">
-      <div className="room-grid">
-        {rooms.map((room) => (
-          <RoomCard
-            key={room.id}
-            room={room}
-            cityName={getProvinceName(room.city || room.province_code)}
-            districtName={getDistrictName(room.district || room.district_code)}
-          />
-        ))}
+      {/* Header công cụ: Đếm kết quả, Thẻ lọc đang chọn & Sắp xếp */}
+      <div className="results-bar">
+        <div className="results-count">
+          Tìm thấy <strong>{rooms.length}</strong> tin đăng phù hợp
+        </div>
+
+        <div className="sort-wrapper">
+          <label htmlFor="sort-select">Sắp xếp:</label>
+          <select
+            id="sort-select"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortOption)}
+          >
+            <option value="newest">Mới nhất</option>
+            <option value="price-asc">Giá thấp đến cao</option>
+            <option value="price-desc">Giá cao đến thấp</option>
+            <option value="area-desc">Diện tích lớn nhất</option>
+          </select>
+        </div>
       </div>
+
+      {/* Hiển thị các tiêu chí đang được lọc */}
+      {activeTags.length > 0 && (
+        <div className="active-tags-container">
+          <span className="tags-label">Đã lọc theo:</span>
+          {activeTags.map((tag) => (
+            <span key={tag.key} className="active-tag-chip">
+              {tag.label}
+            </span>
+          ))}
+          {onResetFilter && (
+            <button className="clear-all-tags-btn" onClick={onResetFilter}>
+              Xóa tất cả
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Hiển thị Skeleton Loader khi đang tải */}
+      {loading ? (
+        <div className="room-grid">
+          {[1, 2, 3].map((item) => (
+            <div key={item} className="room-card-skeleton">
+              <div className="skeleton-img"></div>
+              <div className="skeleton-info">
+                <div className="skeleton-line skeleton-title"></div>
+                <div className="skeleton-line skeleton-price"></div>
+                <div className="skeleton-line skeleton-text"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : sortedRooms.length === 0 ? (
+        /* Trạng thái Không tìm thấy kết quả */
+        <div className="no-result">
+          <div className="no-result-icon">🏠</div>
+          <h3>Không tìm thấy phòng trọ phù hợp</h3>
+          <p>Rất tiếc, không có tin đăng nào đáp ứng đúng tất cả bộ lọc bạn chọn.</p>
+          {onResetFilter && (
+            <button className="reset-filter-action" onClick={onResetFilter}>
+              🔄 Reset bộ lọc để xem tất cả
+            </button>
+          )}
+        </div>
+      ) : (
+        /* Danh sách phòng */
+        <div className="room-grid">
+          {sortedRooms.map((room) => (
+            <RoomCard
+              key={room.id}
+              room={room}
+              cityName={getProvinceName(room)}
+              districtName={getDistrictName(room)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

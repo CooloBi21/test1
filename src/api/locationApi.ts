@@ -11,13 +11,16 @@ const API_URL: string =
  * Lấy danh sách Tỉnh/Thành
  */
 export const getProvinces = async (): Promise<ProvinceItem[]> => {
-  const response = await fetch(`${API_URL}/api/provinces`);
+  const response = await fetch(`${API_URL}/api/provinces`, {
+    cache: "no-store",
+  });
 
   if (!response.ok) {
     throw new Error("Không thể lấy danh sách tỉnh/thành");
   }
 
-  return response.json();
+  const data = await response.json();
+  return Array.isArray(data) ? data : data.data || [];
 };
 
 // ========================================
@@ -28,28 +31,35 @@ export const getProvinces = async (): Promise<ProvinceItem[]> => {
  * Lấy tất cả danh sách Quận/Huyện
  */
 export const getDistricts = async (): Promise<DistrictItem[]> => {
-  const response = await fetch(`${API_URL}/api/districts`);
+  const response = await fetch(`${API_URL}/api/districts`, {
+    cache: "no-store",
+  });
 
   if (!response.ok) {
     throw new Error("Không thể lấy danh sách tất cả quận/huyện");
   }
 
-  return response.json();
+  const data = await response.json();
+  return Array.isArray(data) ? data : data.data || [];
 };
 
 /**
  * Lấy danh sách Quận/Huyện theo Mã Tỉnh
  */
-export const getDistrictsByProvince = async (parentCode: string): Promise<DistrictItem[]> => {
+export const getDistrictsByProvince = async (
+  parentCode: string | number
+): Promise<DistrictItem[]> => {
   if (!parentCode) return [];
 
   const response = await fetch(
-    `${API_URL}/api/districts/by-province?parentCode=${parentCode}`
+    `${API_URL}/api/districts/by-province?parentCode=${parentCode}`,
+    { cache: "no-store" }
   );
 
   if (!response.ok) {
     throw new Error("Lỗi khi lấy danh sách quận/huyện theo tỉnh/thành");
   }
 
-  return response.json();
+  const data = await response.json();
+  return Array.isArray(data) ? data : data.data || [];
 };

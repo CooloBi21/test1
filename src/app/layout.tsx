@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
 import '../index.css';
+import { AuthProvider } from '@/context/AuthContext';
+import { SavedPostsProvider } from '@/context/SavedPostsContext';
+import Navbar from '@/components/Navbar/Navbar';
+import { ChatProvider } from '@/context/ChatContext';
 
 export const metadata: Metadata = {
   title: 'Hệ Thống Tìm Trọ & Phòng Cho Thuê',
@@ -13,7 +17,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {}
+          <ChatProvider>
+            <SavedPostsProvider>
+              <Navbar />
+              <main>{children}</main>
+            </SavedPostsProvider>
+          </ChatProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }
