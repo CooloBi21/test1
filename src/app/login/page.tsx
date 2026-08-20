@@ -20,7 +20,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/auth/login', {
+      // Đọc API URL từ biến môi trường, mặc định fallback về localhost nếu chưa cấu hình
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+      const res = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -29,7 +32,9 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin!');
+        throw new Error(
+          data.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin!'
+        );
       }
 
       login(data.access_token, data.user);
@@ -70,7 +75,9 @@ export default function LoginPage() {
                 autoComplete="email"
                 placeholder="vidu@email.com"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
               />
             </div>
           </div>
@@ -92,7 +99,9 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 placeholder="••••••••"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
               />
             </div>
           </div>
@@ -104,8 +113,7 @@ export default function LoginPage() {
         </form>
 
         <p className="login-footer">
-          Chưa có tài khoản?{' '}
-          <Link href="/register">Đăng ký ngay</Link>
+          Chưa có tài khoản? <Link href="/register">Đăng ký ngay</Link>
         </p>
       </div>
     </div>
