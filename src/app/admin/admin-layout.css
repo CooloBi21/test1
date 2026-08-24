@@ -1,0 +1,152 @@
+/* Khung chứa toàn bộ Admin Dashboard */
+.admin-dashboard-root {
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99999;
+    /* Đảm bảo đè hoàn toàn Navbar/Footer client bên dưới */
+    background-color: #f8fafc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1e293b;
+}
+
+/* Sidebar bên trái (chiếm đúng tỉ lệ/độ rộng cố định) */
+.admin-sidebar {
+    width: 260px;
+    min-width: 260px;
+    background-color: #0f172a;
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.admin-brand {
+    padding: 20px;
+    border-bottom: 1px solid #1e293b;
+}
+
+.admin-brand h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.admin-badge-role {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 10px;
+    background-color: #2563eb;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px;
+    gap: 4px;
+    flex: 1;
+}
+
+.admin-nav-item {
+    padding: 10px 14px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.admin-nav-item:hover {
+    background-color: #1e293b;
+    color: #ffffff;
+}
+
+.admin-nav-item.active {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+.admin-user-footer {
+    padding: 16px;
+    border-top: 1px solid #1e293b;
+    background-color: #020617;
+}
+
+.admin-user-info {
+    margin-bottom: 10px;
+}
+
+.admin-user-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.admin-user-email {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+}
+
+.admin-logout-btn {
+    width: 100%;
+    padding: 8px;
+    background-color: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.admin-logout-btn:hover {
+    background-color: #b91c1c;
+}
+
+/* Khu vực hiển thị nội dung chức năng bên phải */
+.admin-content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: #f8fafc;
+}
+
+.admin-topbar {
+    height: 56px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 24px;
+}
+
+.back-to-site {
+    font-size: 13px;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-to-site:hover {
+    text-decoration: underline;
+}
+
+.admin-main-body {
+    padding: 24px 32px;
+    flex: 1;
+}

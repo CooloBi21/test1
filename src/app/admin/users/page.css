@@ -1,0 +1,47 @@
+.user-name {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.user-email {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.role-badge {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.role-badge.landlord {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.role-badge.admin {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.btn-ban {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.btn-ban:hover {
+    background-color: #b91c1c;
+}
+
+.btn-unban {
+    background-color: #16a34a;
+    color: #ffffff;
+}
+
+.btn-unban:hover {
+    background-color: #15803d;
+}

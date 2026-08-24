@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import '../index.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { SavedPostsProvider } from '@/context/SavedPostsContext';
-import Navbar from '@/components/Navbar/Navbar';
 import { ChatProvider } from '@/context/ChatContext';
 import { NotificationProvider } from '@/context/NotificationContext';
+import ClientLayoutWrapper from '@/components/ClientLayoutWrapper';
 
 export const metadata: Metadata = {
   title: 'Hệ Thống Tìm Trọ & Phòng Cho Thuê',
@@ -16,20 +17,23 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
+
   return (
     <html lang="vi">
       <body>
-        <AuthProvider>
-          {}
-          <NotificationProvider>
-            <ChatProvider>
-              <SavedPostsProvider>
-                <Navbar />
-                <main>{children}</main>
-              </SavedPostsProvider>
-            </ChatProvider>
-          </NotificationProvider>
-        </AuthProvider>
+        <GoogleOAuthProvider clientId={clientId}>
+          <AuthProvider>
+            <NotificationProvider>
+              <ChatProvider>
+                <SavedPostsProvider>
+                  {/* ClientLayoutWrapper quản lý việc ẩn/hiện Navbar & BackgroundGlow tùy theo Route */}
+                  <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
+                </SavedPostsProvider>
+              </ChatProvider>
+            </NotificationProvider>
+          </AuthProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

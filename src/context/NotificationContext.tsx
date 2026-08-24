@@ -73,8 +73,13 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 
     newSocket.emit('joinUser', user.id);
 
+    // Xử lý sự kiện nhận thông báo mới với kiểm tra trùng lặp
     newSocket.on('newNotification', (newNoti: NotificationItem) => {
-      setNotifications((prev) => [newNoti, ...prev]);
+      setNotifications((prev) => {
+        const exists = prev.some((item) => item.id === newNoti.id);
+        if (exists) return prev; // Đã có trong danh sách -> Không chèn lặp lại
+        return [newNoti, ...prev];
+      });
     });
 
     newSocket.on('unreadNotiCountUpdate', (count: number) => {

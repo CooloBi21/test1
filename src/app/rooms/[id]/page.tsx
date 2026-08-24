@@ -5,9 +5,10 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getRoomById, recordRoomView } from '@/api/roomApi';
 import { createOrGetConversation } from '@/api/chatApi';
+import { createReportApi } from '@/api/reportApi';
 import { useAuth } from '@/context/AuthContext';
 import { useSavedPosts } from '@/context/SavedPostsContext';
-import { Heart, MessageCircle, MapPin, ShieldCheck, Edit3 } from 'lucide-react';
+import { Heart, MessageCircle, MapPin, ShieldCheck, Edit3, Flag } from 'lucide-react';
 
 export default function RoomDetailPage() {
   const params = useParams();
@@ -18,6 +19,12 @@ export default function RoomDetailPage() {
   const [room, setRoom] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [submittingChat, setSubmittingChat] = useState(false);
+
+  // State quản lý Modal Báo cáo
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [submittingReport, setSubmittingReport] = useState(false);
+
   const numericRoomId = Number(params?.id);
 
   // Cờ đánh dấu để chống ghi nhận lượt xem 2 lần trong React Strict Mode
@@ -60,6 +67,30 @@ export default function RoomDetailPage() {
       alert('Không thể tạo cuộc trò chuyện với chủ nhà');
     } finally {
       setSubmittingChat(false);
+    }
+  };
+
+  const handleSendReport = async () => {
+    if (!user) {
+      alert('Vui lòng đăng nhập để gửi báo cáo vi phạm!');
+      router.push('/login');
+      return;
+    }
+    if (!reportReason.trim()) {
+      alert('Vui lòng nhập lý do báo cáo');
+      return;
+    }
+
+    try {
+      setSubmittingReport(true);
+      await createReportApi(numericRoomId, reportReason);
+      alert('Báo cáo của bạn đã được gửi thành công!');
+      setShowReportModal(false);
+      setReportReason('');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Có lỗi xảy ra khi gửi báo cáo');
+    } finally {
+      setSubmittingReport(false);
     }
   };
 
@@ -112,7 +143,7 @@ export default function RoomDetailPage() {
           </div>
         </div>
 
-        {/* Nếu người xem chính là chủ sở hữu, hiện thêm nút sửa nhanh */}
+        {/* Nếu người xem chính là chủ sở hữu, hiện nút sửa nhanh */}
         {isOwner ? (
           <Link
             href={`/rooms/${room.id}/edit`}
@@ -181,7 +212,104 @@ export default function RoomDetailPage() {
           <Heart size={18} fill={isRoomSaved ? '#dc2626' : 'none'} color={isRoomSaved ? '#dc2626' : '#475569'} />
           {isRoomSaved ? 'Đã lưu tin' : 'Lưu tin đăng'}
         </button>
+
+        {/* Nút Báo cáo bài viết (Chỉ hiển thị với người xem không phải chủ nhà) */}
+        {!isOwner && (
+          <button
+            onClick={() => setShowReportModal(true)}
+            style={{
+              width: '100%',
+              marginTop: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              color: '#ef4444',
+              background: 'transparent',
+              border: '1px solid #fca5a5',
+              padding: '10px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 600
+            }}
+          >
+            <Flag size={16} /> Báo cáo bài viết
+          </button>
+        )}
       </div>
+
+      {/* MODAL BÁO CÁO VI PHẠM */}
+      {showReportModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#fff',
+            padding: '24px',
+            borderRadius: '8px',
+            width: '100%',
+            maxWidth: '450px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          }}>
+            <h3 style={{ marginTop: 0, fontSize: '18px', fontWeight: 'bold' }}>Báo cáo bài đăng vi phạm</h3>
+            <p style={{ fontSize: '14px', color: '#666', marginBottom: '12px' }}>
+              Hãy mô tả rõ lý do (Thông tin sai sự thật, lừa đảo, hình ảnh không đúng...):
+            </p>
+
+            <textarea
+              rows={4}
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+              placeholder="Nhập chi tiết lý do..."
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                marginBottom: '16px',
+                resize: 'vertical'
+              }}
+            />
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button
+                onClick={() => setShowReportModal(false)}
+                disabled={submittingReport}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  border: '1px solid #ccc',
+                  background: '#f3f4f6',
+                  cursor: 'pointer'
+                }}
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleSendReport}
+                disabled={submittingReport}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: '#ef4444',
+                  color: '#fff',
+                  cursor: 'pointer'
+                }}
+              >
+                {submittingReport ? 'Đang gửi...' : 'Gửi báo cáo'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

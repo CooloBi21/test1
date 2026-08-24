@@ -340,6 +340,32 @@ export const getMyRooms = async (token?: string): Promise<Room[]> => {
   }
 };
 
+/* ==========================================================================
+   6. QUẢN TRỊ VIÊN (ADMIN API)
+   ========================================================================== */
+
+export const updateRoomStatus = async (
+  id: number | string,
+  status: 'approved' | 'rejected',
+  token?: string
+): Promise<any> => {
+  const jwt = getToken(token);
+  if (!jwt) throw new Error('Vui lòng đăng nhập với quyền Admin để thực hiện');
+
+  const response = await fetch(`${API_URL}/api/admin/rooms/${id}/status`, {
+    method: 'PUT',
+    headers: getAuthHeaders(jwt),
+    body: JSON.stringify({ status }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Lỗi khi cập nhật trạng thái bài đăng');
+  }
+
+  return response.json();
+};
+
 // Aliases hỗ trợ linh hoạt cho các tên gọi hàm khác nhau
 export const createRoom = createRoomPost;
 export const updateRoom = updateRoomPost;

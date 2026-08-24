@@ -1,3 +1,6 @@
+/* ==========================================
+   GLOBAL RESETS & BASE STYLES
+   ========================================== */
 * {
   box-sizing: border-box;
 }
@@ -5,18 +8,125 @@
 html,
 body {
   margin: 0;
-
   padding: 0;
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-  background-color: white;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 button,
 select {
   font-family: inherit;
+}
+
+/* Đảm bảo khung nội dung và điều hướng hiển thị phía trên BackgroundGlow */
+main,
+navbar,
+header {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================
+   AURORA FLUID MESH BACKGROUND (ANIMATED)
+   ========================================== */
+
+/* Keyframes chuyển động mượt cho các khối sáng */
+@keyframes blob-float-1 {
+
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(60px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-40px, 20px) scale(0.95);
+  }
+}
+
+@keyframes blob-float-2 {
+
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(-50px, 40px) scale(1.15);
+  }
+
+  66% {
+    transform: translate(40px, -30px) scale(0.9);
+  }
+}
+
+/* 1. Nền tổng thể xám nhạt cao cấp */
+body {
+  background-color: #f1f5f9 !important;
+  color: #0f172a;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 2. Container chứa các khối màu chuyển động ẩn dưới */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.6;
+}
+
+/* Blobs 1: Vệt cam ấm chủ đạo ở góc trên bên trái */
+body::before {
+  top: -100px;
+  left: -50px;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.22) 0%, rgba(251, 146, 60, 0.05) 70%, transparent 100%);
+  animation: blob-float-1 22s ease-in-out infinite;
+}
+
+/* Blobs 2: Vệt xanh chàm tạo chiều sâu ở phía trên bên phải */
+body::after {
+  top: 10%;
+  right: -80px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(30, 58, 138, 0.15) 0%, rgba(99, 102, 241, 0.04) 70%, transparent 100%);
+  animation: blob-float-2 28s ease-in-out infinite;
+}
+
+/* 3. Tăng cường khả năng tôn nội dung cho .surface-card */
+.surface-card {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03) !important;
+  border-radius: 16px !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Hiệu ứng Hover nổi trội & viền sáng khi rê chuột */
+.surface-card:hover {
+  transform: translateY(-6px) scale(1.01) !important;
+  background-color: #ffffff !important;
+  border-color: rgba(249, 115, 22, 0.3) !important;
+  box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.12), 0 8px 12px -4px rgba(249, 115, 22, 0.08) !important;
+}
+
+/* Tắt chuyển động nếu người dùng bật giảm chuyển động ở OS */
+@media (prefers-reduced-motion: reduce) {
+
+  body::before,
+  body::after {
+    animation: none;
+  }
 }

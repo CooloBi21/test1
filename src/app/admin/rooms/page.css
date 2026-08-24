@@ -1,0 +1,172 @@
+.admin-container,
+.admin-page-container {
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 16px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.admin-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.admin-filter {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.admin-filter-label {
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.admin-select {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    outline: none;
+    font-size: 14px;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+.admin-empty {
+    padding: 32px;
+    text-align: center;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    color: #6b7280;
+}
+
+/* Đảm bảo khung bảng luôn giữ đúng vị trí */
+.admin-table-wrapper {
+    position: relative;
+    overflow-x: auto;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    background-color: #ffffff;
+}
+
+.admin-table th {
+    padding: 12px 16px;
+    font-weight: 600;
+    color: #374151;
+    background-color: #f3f4f6;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+.room-id {
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.room-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.room-link:hover {
+    text-decoration: underline;
+}
+
+/* Định dạng Badge Trạng thái chính xác tại ô dữ liệu */
+.badge {
+    position: static !important;
+    /* Triệt tiêu mọi thuộc tính position tuyệt đối trôi nổi */
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.badge-approved {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.badge-rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.btn-approve {
+    background-color: #16a34a;
+    color: #ffffff;
+}
+
+.btn-approve:hover:not(:disabled) {
+    background-color: #15803d;
+}
+
+.btn-reject {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.btn-reject:hover:not(:disabled) {
+    background-color: #b91c1c;
+}
+
+.text-center {
+    text-align: center;
+}

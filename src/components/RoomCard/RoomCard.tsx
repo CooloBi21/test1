@@ -40,7 +40,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, cityName, districtName }) => 
   const authorName = room.user?.full_name || (room as any).author?.full_name || (room as any).author_name || 'Người dùng';
 
   return (
-    <article className="room-card">
+    <article className="room-card surface-card">
       <div className="room-image-wrapper">
         <Link href={detailUrl}>
           <img src={imageUrl} alt={room.title} className="room-image" loading="lazy" />

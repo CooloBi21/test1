@@ -1,0 +1,161 @@
+.support-container {
+    max-width: 850px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: inherit;
+}
+
+.support-header {
+    margin-bottom: 24px;
+}
+
+.support-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 6px;
+}
+
+.support-subtitle {
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* Card Form Gửi Ticket */
+.support-form-card {
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    margin-bottom: 36px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    font-size: 14px;
+    color: #0f172a;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-select:focus,
+.form-textarea:focus {
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.btn-submit-ticket {
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    transition: all 0.2s ease;
+}
+
+.btn-submit-ticket:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+/* Danh Sách Lịch Sử Ticket */
+.ticket-list-section {
+    margin-top: 24px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 16px;
+}
+
+.ticket-item-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease;
+}
+
+.ticket-item-card:hover {
+    border-color: #cbd5e1;
+}
+
+.ticket-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.ticket-category-tag {
+    font-weight: 600;
+    color: #2563eb;
+    font-size: 14px;
+}
+
+.ticket-status-pill {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.status-open {
+    background-color: #fef9c3;
+    color: #854d0e;
+}
+
+.status-resolved {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.ticket-message {
+    margin: 0 0 12px 0;
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.admin-reply-box {
+    background: #f1f5f9;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-left: 4px solid #2563eb;
+    margin-top: 10px;
+    font-size: 13.5px;
+    color: #1e293b;
+}
+
+.admin-reply-title {
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 4px;
+}

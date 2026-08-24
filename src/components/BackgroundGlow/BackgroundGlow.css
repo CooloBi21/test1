@@ -1,0 +1,84 @@
+/* Container bao phủ toàn màn hình đằng sau nội dung */
+.bg-animation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+/* Vệt sáng đi theo con trỏ chuột */
+.mouse-glow-follower {
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+            rgba(249, 115, 22, 0.18) 0%,
+            rgba(59, 130, 246, 0.08) 50%,
+            transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s ease, transform 0.08s ease-out;
+    filter: blur(30px);
+    opacity: 1;
+}
+
+/* Ẩn vệt sáng khi di chuyển chuột vào trong khung nội dung */
+.mouse-glow-follower.hidden {
+    opacity: 0;
+}
+
+/* Sticker trôi nổi 2 bên lề */
+.floating-stickers .sticker {
+    position: absolute;
+    font-size: 2.2rem;
+    opacity: 0.35;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.05));
+    user-select: none;
+}
+
+/* Vị trí & Animation trôi nổi nhẹ nhàng */
+.sticker.float-1 {
+    top: 15%;
+    left: 4%;
+    animation: float-anim 18s ease-in-out infinite;
+}
+
+.sticker.float-2 {
+    top: 45%;
+    left: 3%;
+    animation: float-anim 22s ease-in-out infinite 2s;
+}
+
+.sticker.float-3 {
+    top: 75%;
+    left: 5%;
+    animation: float-anim 20s ease-in-out infinite 4s;
+}
+
+.sticker.float-4 {
+    top: 25%;
+    right: 4%;
+    animation: float-anim 24s ease-in-out infinite 1s;
+}
+
+.sticker.float-5 {
+    top: 65%;
+    right: 3%;
+    animation: float-anim 19s ease-in-out infinite 3s;
+}
+
+@keyframes float-anim {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-25px) rotate(12deg);
+    }
+}

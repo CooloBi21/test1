@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   Tag,
   UserCheck,
+  Headphones,
 } from 'lucide-react';
 import './Navbar.css';
 
@@ -236,6 +237,16 @@ export default function Navbar() {
                   <div className="dropdown-section">
                     <div className="dropdown-section-title">Tiện ích</div>
 
+                    {/* Nút truy cập Trang Quản Trị chỉ dành cho Admin */}
+                    {user?.role?.toLowerCase() === 'admin' && (
+                      <Link href="/admin/dashboard" className="dropdown-item" onClick={() => setActiveMenu(null)}>
+                        <div className="item-left">
+                          <Settings className="item-icon" style={{ color: '#4f46e5' }} />
+                          <span style={{ color: '#4f46e5', fontWeight: 600 }}>Trang Quản Trị</span>
+                        </div>
+                      </Link>
+                    )}
+
                     <Link href="/profile" className="dropdown-item" onClick={() => setActiveMenu(null)}>
                       <div className="item-left"><UserCheck className="item-icon text-orange" /><span>Xem thông tin & Bài đăng</span></div>
                     </Link>
@@ -259,6 +270,9 @@ export default function Navbar() {
                   <div className="dropdown-section">
                     <Link href="/settings" className="dropdown-item" onClick={() => setActiveMenu(null)}>
                       <div className="item-left"><Settings className="item-icon" /><span>Cài đặt tài khoản</span></div>
+                    </Link>
+                    <Link href="/support" className="dropdown-item" onClick={() => setActiveMenu(null)}>
+                      <div className="item-left"><Headphones className="item-icon text-purple" /><span>Liên hệ & Trợ giúp</span></div>
                     </Link>
                     <button type="button" onClick={() => { setActiveMenu(null); logout(); }} className="dropdown-item logout-item">
                       <div className="item-left"><LogOut className="item-icon text-red" /><span>Đăng xuất</span></div>

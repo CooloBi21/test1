@@ -3,18 +3,21 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 import { User, Mail, Phone, Lock, UserPlus, AlertCircle } from 'lucide-react';
+import GoogleLoginButton from '@/components/GoogleLoginButton/GoogleLoginButton';
 import './page.css';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
     password: '',
     phone: '',
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,7 +26,6 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // Đọc API URL từ biến môi trường, tự động fallback về localhost nếu chưa cấu hình
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
       const res = await fetch(`${apiUrl}/auth/register`, {
@@ -303,6 +305,37 @@ export default function RegisterPage() {
             {loading ? 'Đang đăng ký...' : 'Đăng Ký Tài Khoản'}
           </button>
         </form>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            margin: '20px 0',
+            color: '#94a3b8',
+            fontSize: '13px',
+          }}
+        >
+          <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+          <span style={{ padding: '0 10px', fontWeight: 600 }}>HOẶC</span>
+          <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <GoogleLoginButton
+            text="signup_with"
+            onSuccess={(data) => {
+              login(data.access_token, data.user);
+              router.push('/');
+            }}
+            onError={(err) => {
+              setError(
+                typeof err === 'string'
+                  ? err
+                  : 'Đăng ký bằng Google thất bại'
+              );
+            }}
+          />
+        </div>
 
         <p
           style={{
