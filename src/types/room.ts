@@ -1,3 +1,12 @@
+// Định nghĩa interface cho người đăng bài (mới thêm)
+export interface RoomOwner {
+  id: number | string;
+  full_name: string;
+  phone: string;
+  avatar?: string;
+  is_verified?: boolean;
+}
+
 export interface Province {
   code: string | number;
   name?: string;
@@ -13,7 +22,7 @@ export interface District {
 
 export interface Room {
   id: number | string;
-  userId: number;
+  userId?: number | string;
   title: string;
   price: number | string;
   area: number | string;
@@ -24,19 +33,27 @@ export interface Room {
   district?: string | number;
   city_name?: string;
   district_name?: string;
+  
+  // Hình ảnh
   image?: string;
   thumbnail?: string;
   images?: string[];
+  
+  // Tiện ích (mới thêm)
+  amenities?: string[];
+  
+  // Nội dung
   description?: string;
   content?: string;
-  created_at?: string;
   
-  // --- THÊM CÁC TRƯỜNG THÔNG TIN NGƯỜI ĐĂNG ---
-  user?: {
-    id?: number | string;
-    full_name?: string;
-    avatar?: string;
-  };
+  // Thời gian
+  created_at?: string;
+  createdAt?: string;
+  
+  // --- THÔNG TIN NGƯỜI ĐĂNG (Cập nhật sử dụng RoomOwner) ---
+  user?: RoomOwner;
+  
+  // Giữ lại author cho tương thích ngược nếu có component cũ đang dùng
   author?: {
     id?: number | string;
     full_name?: string;

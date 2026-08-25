@@ -3,14 +3,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import Filter, { ProvinceItem, DistrictItem } from '../components/Filter/Filter';
 import RoomList, { FilterTag } from '../components/RoomList/RoomList';
-import CandleStickChart from '../components/CandleStickChart/CandleStickChart';
 import { Room, RoomFilterParams } from '../types/room';
-import { CandlestickItem } from '../types/candlestick';
 import { getRooms } from '../api/roomApi';
 import { getProvinces, getDistrictsByProvince } from '../api/locationApi';
-import { TrendingUp, Sparkles, Building2 } from 'lucide-react';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+import { Sparkles } from 'lucide-react';
 
 export default function HomePage() {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -18,8 +14,6 @@ export default function HomePage() {
 
   const [provinces, setProvinces] = useState<ProvinceItem[]>([]);
   const [districts, setDistricts] = useState<DistrictItem[]>([]);
-
-  const [candlestickData, setCandlestickData] = useState<CandlestickItem[]>([]);
 
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
@@ -37,21 +31,8 @@ export default function HomePage() {
       }
     };
 
-    const fetchCandlestick = async () => {
-      try {
-        const res = await fetch(`${API_URL}/candlestick`);
-        if (res.ok) {
-          const data = await res.json();
-          setCandlestickData(data);
-        }
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu nến:', error);
-      }
-    };
-
     fetchInitialData();
     fetchRooms({});
-    fetchCandlestick();
   }, []);
 
   useEffect(() => {
@@ -196,26 +177,6 @@ export default function HomePage() {
         activeTags={activeFilterTags}
         onResetFilter={handleResetFilter}
       />
-
-      {/* Market Trends Section */}
-      <div style={{ marginTop: '56px', background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.05)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-          <div style={{ background: '#fff7ed', padding: '10px', borderRadius: '10px', color: '#ea580c' }}>
-            <TrendingUp size={22} />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
-              Biến Động Thị Trường
-            </h2>
-            <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Cập nhật chỉ số tham chiếu kinh tế & bất động sản</p>
-          </div>
-        </div>
-        <CandleStickChart
-          data={candlestickData}
-          title="Tỷ giá VN-Index / Crypto"
-          height={400}
-        />
-      </div>
     </main>
   );
 }

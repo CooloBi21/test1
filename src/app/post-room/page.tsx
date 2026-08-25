@@ -67,6 +67,21 @@ export default function PostRoomPage() {
     setImageUrlInput('');
   };
 
+  const handleResetForm = () => {
+    setFormData({
+      title: '',
+      price: '',
+      area: '',
+      city: '',
+      district: '',
+      addressLine: '',
+      content: '',
+    });
+    setExternalImageUrls([]);
+    setImageUrlInput('');
+    setSubmitted(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -108,10 +123,13 @@ export default function PostRoomPage() {
 
   if (submitted) {
     return (
-      <div className="success-box">
+      <div className="success-box" style={{ textAlign: 'center', padding: '60px 20px', maxWidth: '600px', margin: '40px auto', background: '#fff', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
         <CheckCircle size={60} color="#16a34a" style={{ margin: '0 auto 16px' }} />
-        <h2>Gửi tin đăng thành công!</h2>
-        <button onClick={() => window.location.reload()} className="btn-submit" style={{ padding: '10px 24px', marginTop: '10px' }}>
+        <h2 style={{ fontSize: '24px', color: '#0f172a', marginBottom: '12px' }}>Gửi tin đăng thành công!</h2>
+        <p style={{ color: '#64748b', margin: '0 0 24px', lineHeight: 1.6 }}>
+          Bài viết của bạn đã được tiếp nhận và đang chờ Admin kiểm duyệt trước khi hiển thị công khai.
+        </p>
+        <button onClick={handleResetForm} className="btn-submit" style={{ padding: '12px 32px', maxWidth: 'max-content', margin: '0 auto' }}>
           Đăng tin mới
         </button>
       </div>

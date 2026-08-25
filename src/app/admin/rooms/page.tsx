@@ -24,9 +24,12 @@ export default function AdminRoomsPage() {
     const fetchRooms = async () => {
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const res = await fetch(`${API_URL}/api/rooms`, {
+        
+        // Gọi đúng endpoint riêng của Admin
+        const res = await fetch(`${API_URL}/api/admin/rooms`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
+        
         const data = await res.json();
         const roomList = Array.isArray(data) ? data : data.data || [];
         setRooms(roomList);
