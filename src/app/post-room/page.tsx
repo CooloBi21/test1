@@ -101,6 +101,7 @@ export default function PostRoomPage() {
         ? `📍${formData.addressLine}\n\n${formData.content}`
         : formData.content;
 
+      // BƯỚC 3.1: Gửi mảng ảnh (images) trong payload
       const payload = {
         title: formData.title,
         price: Number(formData.price),
@@ -109,6 +110,7 @@ export default function PostRoomPage() {
         district: formData.district,     
         content: fullContent,            
         thumbnail: externalImageUrls[0] || "", 
+        images: externalImageUrls, // <-- Đã bổ sung mảng ảnh
       };
       
       await createRoomPost(payload);

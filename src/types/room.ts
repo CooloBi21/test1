@@ -37,7 +37,7 @@ export interface Room {
   // Hình ảnh
   image?: string;
   thumbnail?: string;
-  images?: string[];
+  images?: string[] | string;
   
   // Tiện ích (mới thêm)
   amenities?: string[];
