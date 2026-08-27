@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import Pagination from '@/components/Pagination/Pagination';
 import '../rooms/page.css';
 
 interface UserItem {
@@ -19,6 +20,10 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Trạng thái phân trang
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10; // Số lượng người dùng trên mỗi trang
 
   const [banModal, setBanModal] = useState<{ open: boolean; user: UserItem | null; reason: string }>({
     open: false,
@@ -60,6 +65,18 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  // Tự động lùi về trang trước nếu trang hiện tại bị rỗng dữ liệu sau khi xóa/cập nhật
+  useEffect(() => {
+    const totalPages = Math.ceil(users.length / pageSize);
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [users.length, currentPage, pageSize]);
+
+  // Cắt mảng người dùng theo trang hiện tại
+  const startIndex = (currentPage - 1) * pageSize;
+  const currentUsers = users.slice(startIndex, startIndex + pageSize);
 
   const handleToggleRole = async (targetUser: UserItem) => {
     if (!isSuperAdmin) {
@@ -156,9 +173,9 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div>
+    <div className="admin-page-container">
       <div className="admin-header">
-        <h1 className="admin-title">Quản lý người dùng</h1>
+        <h1 className="admin-title">Quản lý người dùng ({users.length})</h1>
       </div>
 
       {error && (
@@ -187,7 +204,7 @@ export default function AdminUsersPage() {
                 </td>
               </tr>
             ) : (
-              users.map((u) => {
+              currentUsers.map((u) => {
                 const isAdminRole = u.role.toLowerCase() === 'admin';
                 return (
                   <tr key={u.id}>
@@ -261,6 +278,18 @@ export default function AdminUsersPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Component Phân Trang */}
+      {users.length > pageSize && (
+        <div style={{ marginTop: '24px' }}>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={users.length}
+            pageSize={pageSize}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </div>
+      )}
 
       {/* Modal Nhập lý do khóa */}
       {banModal.open && (

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import Pagination from '@/components/Pagination/Pagination';
 import { getAdminReportsApi, updateReportStatusApi } from '@/api/reportApi';
 import { updateRoomStatus } from '@/api/roomApi';
 import '../rooms/page.css';
@@ -28,6 +29,10 @@ export default function AdminReportsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Trạng thái phân trang
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10;
+
   const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
@@ -46,6 +51,18 @@ export default function AdminReportsPage() {
     fetchReports();
   }, [fetchReports]);
 
+  // Tự động lùi về trang trước nếu trang hiện tại bị rỗng dữ liệu sau khi xử lý
+  useEffect(() => {
+    const totalPages = Math.ceil(reports.length / pageSize);
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [reports.length, currentPage, pageSize]);
+
+  // Cắt mảng báo cáo theo trang hiện tại
+  const startIndex = (currentPage - 1) * pageSize;
+  const currentReports = reports.slice(startIndex, startIndex + pageSize);
+
   // Xử lý Khóa bài viết vi phạm (Chuyển trạng thái phòng thành 'rejected' và báo cáo thành 'resolved')
   const handleBlockRoom = async (reportId: number, roomId: number) => {
     if (!confirm('Bạn có chắc muốn khóa bài đăng này do vi phạm?')) return;
@@ -63,6 +80,7 @@ export default function AdminReportsPage() {
 
   // Bỏ qua báo cáo (Chuyển trạng thái báo cáo thành 'dismissed')
   const handleDismissReport = async (reportId: number) => {
+    if (!confirm('Bạn có chắc muốn bỏ qua báo cáo này?')) return;
     try {
       await updateReportStatusApi(reportId, 'dismissed');
       await fetchReports();
@@ -77,9 +95,9 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <div>
+    <div className="admin-page-container">
       <div className="admin-header">
-        <h1 className="admin-title">Quản lý báo cáo vi phạm</h1>
+        <h1 className="admin-title">Quản lý báo cáo vi phạm ({reports.length})</h1>
       </div>
 
       {error && (
@@ -108,7 +126,7 @@ export default function AdminReportsPage() {
                 </td>
               </tr>
             ) : (
-              reports.map((report) => (
+              currentReports.map((report) => (
                 <tr key={report.id}>
                   <td className="room-id">#{report.id}</td>
                   <td>
@@ -171,6 +189,18 @@ export default function AdminReportsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Component Phân Trang */}
+      {reports.length > pageSize && (
+        <div style={{ marginTop: '24px' }}>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={reports.length}
+            pageSize={pageSize}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </div>
+      )}
     </div>
   );
 }

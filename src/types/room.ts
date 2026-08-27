@@ -40,7 +40,11 @@ export interface Room {
   images?: string[] | string;
   
   // Tiện ích (mới thêm)
-  amenities?: string[];
+  amenities?: string[] | string;
+  utilities?: string[] | string;
+  facilities?: string[] | string;
+  conveniences?: string[] | string;
+  features?: string[] | string;
   
   // Nội dung
   description?: string;

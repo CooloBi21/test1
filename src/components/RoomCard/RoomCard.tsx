@@ -12,6 +12,51 @@ interface RoomCardProps {
   districtName?: string;
 }
 
+const NEW_ROOM_WINDOW_MS = 72 * 60 * 60 * 1000;
+
+const parseRoomCreatedDate = (value?: string | Date) => {
+  if (!value) return null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+
+  const trimmedValue = String(value).trim();
+  const hasTimezone = /(Z|[+-]\d{2}:?\d{2})$/.test(trimmedValue);
+
+  if (hasTimezone) {
+    const date = new Date(trimmedValue);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const match = trimmedValue.match(
+    /^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?$/
+  );
+
+  if (match) {
+    const [, year, month, day, hour, minute, second = '0'] = match;
+    return new Date(
+      Date.UTC(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        Number(hour),
+        Number(minute),
+        Number(second)
+      )
+    );
+  }
+
+  const date = new Date(trimmedValue);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const isNewRoom = (room: Room) => {
+  const createdDate = parseRoomCreatedDate(room.created_at || room.createdAt);
+  if (!createdDate) return false;
+
+  const ageMs = Date.now() - createdDate.getTime();
+
+  return ageMs >= 0 && ageMs <= NEW_ROOM_WINDOW_MS;
+};
+
 const RoomCard: React.FC<RoomCardProps> = ({ room, cityName, districtName }) => {
   const { isSaved, toggleSavePost } = useSavedPosts();
 
@@ -27,6 +72,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, cityName, districtName }) => 
   ].filter(Boolean).join(', ');
 
   const currentlySaved = room.id ? isSaved(Number(room.id)) : false;
+  const showNewBadge = isNewRoom(room);
 
   const handleToggleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -37,7 +83,9 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, cityName, districtName }) => 
 
   // Giả định backend trả về thông tin người đăng trong object user hoặc author
   // Ví dụ: room.user.full_name hoặc room.author_name
-  const authorName = room.user?.full_name || (room as any).author?.full_name || (room as any).author_name || 'Người dùng';
+  const authorName =
+    room.user?.full_name || (room as any).author?.full_name || (room as any).author_name || 'Chủ bài đăng';
+  const authorInitial = authorName.trim().charAt(0).toUpperCase() || 'U';
 
   return (
     <article className="room-card surface-card">
@@ -45,7 +93,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, cityName, districtName }) => 
         <Link href={detailUrl}>
           <img src={imageUrl} alt={room.title} className="room-image" loading="lazy" />
         </Link>
-        <span className="room-tag-badge">Mới</span>
+        {showNewBadge && <span className="room-tag-badge">Mới</span>}
         <button 
           className={`save-btn ${currentlySaved ? 'saved' : ''}`}
           onClick={handleToggleSave}
@@ -80,7 +128,11 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, cityName, districtName }) => 
         <div className="room-card-footer">
           {/* HIỂN THỊ NGƯỜI ĐĂNG TẠI ĐÂY */}
           <div className="room-author">
-            <span className="author-avatar">👤</span>
+            {room.user?.avatar ? (
+              <img src={room.user.avatar} alt={authorName} className="author-avatar-img" />
+            ) : (
+              <span className="author-avatar">{authorInitial}</span>
+            )}
             <span className="author-name">{authorName}</span>
           </div>
           

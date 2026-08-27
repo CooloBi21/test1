@@ -1,7 +1,15 @@
+/* ==========================================
+   ROOM LIST CONTAINER & WRAPPER
+   ========================================== */
+.room-list-wrapper,
 .room-list-container {
   width: 100%;
+  margin-top: 24px;
 }
 
+/* ==========================================
+   RESULTS BAR & SORTING
+   ========================================== */
 .results-bar {
   display: flex;
   justify-content: space-between;
@@ -12,11 +20,11 @@
 
 .results-count {
   font-size: 15px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .results-count strong {
-  color: #d9341b;
+  color: var(--accent-strong);
   font-size: 17px;
 }
 
@@ -25,20 +33,29 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .sort-wrapper select {
   height: 34px;
   padding: 0 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background-color: #fff;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
   font-size: 13px;
   cursor: pointer;
   outline: none;
+  transition: border-color 0.2s ease;
 }
 
+.sort-wrapper select:focus {
+  border-color: var(--accent-color);
+}
+
+/* ==========================================
+   ACTIVE FILTER TAGS
+   ========================================== */
 .active-tags-container {
   display: flex;
   flex-wrap: wrap;
@@ -46,19 +63,19 @@
   gap: 8px;
   margin-bottom: 16px;
   padding: 8px 12px;
-  background-color: #fbf5e8;
+  background-color: var(--accent-soft);
   border-radius: 6px;
-  border: 1px dashed #e2c896;
+  border: 1px dashed var(--border-strong);
 }
 
 .tags-label {
   font-size: 12px;
   font-weight: 700;
-  color: #8c4a16;
+  color: var(--accent-strong);
 }
 
 .active-tag-chip {
-  background-color: #f39c12;
+  background-color: var(--accent-color);
   color: #ffffff;
   font-size: 12px;
   font-weight: 600;
@@ -69,7 +86,7 @@
 .clear-all-tags-btn {
   background: none;
   border: none;
-  color: #d9341b;
+  color: var(--accent-strong);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -77,20 +94,46 @@
   margin-left: auto;
 }
 
+.clear-all-tags-btn:hover {
+  color: var(--accent-color);
+}
+
+/* ==========================================
+   ROOM GRID / LIST LAYOUT
+   ========================================== */
 .room-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
-/* Skeleton Loading */
+/* Option: Nếu muốn hiển thị dạng lưới dạng Card trên màn hình lớn */
+/*
+@media (min-width: 768px) {
+  .room-grid.grid-view {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .room-grid.grid-view {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+*/
+
+/* ==========================================
+   SKELETON LOADING
+   ========================================== */
 .room-card-skeleton {
   display: flex;
   width: 100%;
   height: 150px;
   padding: 12px;
-  background: #fff;
-  border: 1px solid #eee;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   gap: 16px;
   box-sizing: border-box;
@@ -99,8 +142,9 @@
 .skeleton-img {
   width: 220px;
   height: 100%;
-  background: #eee;
+  background: var(--bg-subtle);
   border-radius: 6px;
+  flex-shrink: 0;
   animation: skeleton-pulse 1.2s infinite ease-in-out;
 }
 
@@ -112,7 +156,7 @@
 }
 
 .skeleton-line {
-  background: #eee;
+  background: var(--bg-subtle);
   border-radius: 4px;
   animation: skeleton-pulse 1.2s infinite ease-in-out;
 }
@@ -146,15 +190,19 @@
   }
 }
 
-/* No result */
+/* ==========================================
+   EMPTY STATE & NO RESULT
+   ========================================== */
+.room-empty-state,
 .no-result {
   width: 100%;
   padding: 48px 20px;
   text-align: center;
-  background-color: #ffffff;
-  border: 1px dashed #cca262;
+  background-color: var(--bg-surface);
+  border: 1px dashed var(--border-strong);
   border-radius: 8px;
   box-sizing: border-box;
+  margin-top: 16px;
 }
 
 .no-result-icon {
@@ -164,18 +212,21 @@
 
 .no-result h3 {
   margin: 0 0 8px 0;
-  color: #8c4a16;
+  color: var(--accent-strong);
+  font-size: 18px;
+  font-weight: 700;
 }
 
-.no-result p {
+.no-result p,
+.room-empty-state {
   margin: 0 0 16px 0;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 .reset-filter-action {
-  background-color: #f39c12;
-  color: #fff;
+  background-color: var(--accent-color);
+  color: #ffffff;
   border: none;
   padding: 10px 20px;
   border-radius: 6px;
@@ -185,13 +236,26 @@
 }
 
 .reset-filter-action:hover {
-  background-color: #e67e22;
+  background-color: var(--accent-strong);
 }
 
+/* ==========================================
+   RESPONSIVE MEDIA QUERIES
+   ========================================== */
 @media (max-width: 640px) {
   .results-bar {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+
+  .room-card-skeleton {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .skeleton-img {
+    width: 100%;
+    height: 160px;
   }
 }

@@ -1,5 +1,8 @@
-import React, { useState, useMemo } from 'react';
+'use client';
+
+import React, { useState, useEffect, useMemo } from 'react';
 import RoomCard from '../RoomCard/RoomCard';
+import Pagination from '../Pagination/Pagination';
 import { Room, Province, District, SortOption } from '@/types/room';
 import './RoomList.css';
 
@@ -9,24 +12,33 @@ export interface FilterTag {
 }
 
 interface RoomListProps {
-  rooms: Room[];
+  rooms?: Room[];
   loading?: boolean;
   provinces?: Record<string, any> | Province[];
   districts?: Record<string, any> | District[];
   activeTags?: FilterTag[];
   onResetFilter?: () => void;
+  pageSize?: number;
 }
 
-const RoomList: React.FC<RoomListProps> = ({
+export const RoomList: React.FC<RoomListProps> = ({
   rooms = [],
   loading = false,
   provinces = [],
   districts = [],
   activeTags = [],
   onResetFilter,
+  pageSize = 5, // Cố định mặc định 5 bài đăng trên 1 trang
 }) => {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [currentPage, setCurrentPage] = useState(1);
 
+  // Reset về trang 1 mỗi khi danh sách phòng hoặc kiểu sắp xếp thay đổi
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [rooms, sortBy]);
+
+  // Hàm hỗ trợ lấy tên Tỉnh/Thành phố
   const getProvinceName = (room: Room): string => {
     if (room.city_name) return room.city_name;
     const cityCode = room.city || room.province_code;
@@ -40,6 +52,7 @@ const RoomList: React.FC<RoomListProps> = ({
     return province?.name_with_type || province?.name || 'Không xác định';
   };
 
+  // Hàm hỗ trợ lấy tên Quận/Huyện
   const getDistrictName = (room: Room): string => {
     if (room.district_name) return room.district_name;
     const districtCode = room.district || room.district_code;
@@ -53,7 +66,7 @@ const RoomList: React.FC<RoomListProps> = ({
     return district?.name_with_type || district?.name || 'Không xác định';
   };
 
-  // Sắp xếp dữ liệu client-side mà không làm hỏng API
+  // 1. Sắp xếp dữ liệu client-side
   const sortedRooms = useMemo(() => {
     const list = [...rooms];
     switch (sortBy) {
@@ -69,9 +82,15 @@ const RoomList: React.FC<RoomListProps> = ({
     }
   }, [rooms, sortBy]);
 
+  // 2. CẮT MẢNG DỮ LIỆU: Chỉ lấy đúng 5 bài cho trang hiện tại
+  const paginatedRooms = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return sortedRooms.slice(startIndex, startIndex + pageSize);
+  }, [sortedRooms, currentPage, pageSize]);
+
   return (
     <div className="room-list-container">
-      {/* Header công cụ: Đếm kết quả, Thẻ lọc đang chọn & Sắp xếp */}
+      {/* Header công cụ: Đếm kết quả, Sắp xếp */}
       <div className="results-bar">
         <div className="results-count">
           Tìm thấy <strong>{rooms.length}</strong> tin đăng phù hợp
@@ -112,7 +131,7 @@ const RoomList: React.FC<RoomListProps> = ({
       {/* Hiển thị Skeleton Loader khi đang tải */}
       {loading ? (
         <div className="room-grid">
-          {[1, 2, 3].map((item) => (
+          {[1, 2, 3, 4, 5].map((item) => (
             <div key={item} className="room-card-skeleton">
               <div className="skeleton-img"></div>
               <div className="skeleton-info">
@@ -136,17 +155,29 @@ const RoomList: React.FC<RoomListProps> = ({
           )}
         </div>
       ) : (
-        /* Danh sách phòng */
-        <div className="room-grid">
-          {sortedRooms.map((room) => (
-            <RoomCard
-              key={room.id}
-              room={room}
-              cityName={getProvinceName(room)}
-              districtName={getDistrictName(room)}
+        /* Danh sách phòng đã cắt (paginatedRooms) + Phân trang */
+        <>
+          <div className="room-grid">
+            {paginatedRooms.map((room) => (
+              <RoomCard
+                key={room.id}
+                room={room}
+                cityName={getProvinceName(room)}
+                districtName={getDistrictName(room)}
+              />
+            ))}
+          </div>
+
+          {/* Thanh Phân Trang (Chỉ hiển thị khi tổng số phòng > pageSize) */}
+          {sortedRooms.length > pageSize && (
+            <Pagination
+              currentPage={currentPage}
+              totalItems={sortedRooms.length}
+              pageSize={pageSize}
+              onPageChange={(page) => setCurrentPage(page)}
             />
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

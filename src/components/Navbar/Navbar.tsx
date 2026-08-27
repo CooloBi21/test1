@@ -6,22 +6,23 @@ import { useAuth } from '@/context/AuthContext';
 import { useSavedPosts } from '@/context/SavedPostsContext';
 import { useChat } from '@/context/ChatContext';
 import { useNotifications } from '@/context/NotificationContext';
+import { useTheme } from '@/context/ThemeContext';
 import {
   Home,
   Heart,
   MessageSquare,
   Bell,
   ChevronDown,
-  Bookmark,
   History,
   Star,
   Settings,
   LogOut,
   PlusCircle,
   CheckCircle2,
-  Tag,
   UserCheck,
   Headphones,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import './Navbar.css';
 
@@ -29,6 +30,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { savedPosts } = useSavedPosts();
   const { unreadCount } = useChat();
+  const { theme, toggleTheme } = useTheme();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const navbarRef = useRef<HTMLDivElement>(null);
 
@@ -254,9 +256,6 @@ export default function Navbar() {
                     <Link href="/saved-posts" className="dropdown-item" onClick={() => setActiveMenu(null)}>
                       <div className="item-left"><Heart className="item-icon text-red" /><span>Tin đã lưu</span></div>
                     </Link>
-                    <Link href="/saved-searches" className="dropdown-item" onClick={() => setActiveMenu(null)}>
-                      <div className="item-left"><Bookmark className="item-icon text-orange" /><span>Tìm kiếm đã lưu</span></div>
-                    </Link>
                     <Link href="/history" className="dropdown-item" onClick={() => setActiveMenu(null)}>
                       <div className="item-left"><History className="item-icon text-blue" /><span>Lịch sử xem tin</span></div>
                     </Link>
@@ -274,6 +273,18 @@ export default function Navbar() {
                     <Link href="/support" className="dropdown-item" onClick={() => setActiveMenu(null)}>
                       <div className="item-left"><Headphones className="item-icon text-purple" /><span>Liên hệ & Trợ giúp</span></div>
                     </Link>
+
+                    {/* CÔNG TẮC GẠT CHỌN CHẾ ĐỘ NỀN */}
+                    <div className="dropdown-item theme-toggle-row" onClick={toggleTheme}>
+                      <div className="theme-info">
+                        {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
+                        <span>Chế độ nền: <strong>{theme === 'dark' ? 'Tối' : 'Sáng'}</strong></span>
+                      </div>
+                      <div className={`theme-switch ${theme === 'dark' ? 'active' : ''}`}>
+                        <span className="theme-switch-thumb" />
+                      </div>
+                    </div>
+
                     <button type="button" onClick={() => { setActiveMenu(null); logout(); }} className="dropdown-item logout-item">
                       <div className="item-left"><LogOut className="item-icon text-red" /><span>Đăng xuất</span></div>
                     </button>

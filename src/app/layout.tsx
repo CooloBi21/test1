@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import '../index.css';
+import './theme.css';
+import { ThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { SavedPostsProvider } from '@/context/SavedPostsContext';
 import { ChatProvider } from '@/context/ChatContext';
@@ -22,18 +24,20 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body>
-        <GoogleOAuthProvider clientId={clientId}>
-          <AuthProvider>
-            <NotificationProvider>
-              <ChatProvider>
-                <SavedPostsProvider>
-                  {/* ClientLayoutWrapper quản lý việc ẩn/hiện Navbar & BackgroundGlow tùy theo Route */}
-                  <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
-                </SavedPostsProvider>
-              </ChatProvider>
-            </NotificationProvider>
-          </AuthProvider>
-        </GoogleOAuthProvider>
+        <ThemeProvider>
+          <GoogleOAuthProvider clientId={clientId}>
+            <AuthProvider>
+              <NotificationProvider>
+                <ChatProvider>
+                  <SavedPostsProvider>
+                    {/* ClientLayoutWrapper quản lý việc ẩn/hiện Navbar & BackgroundGlow tùy theo Route */}
+                    <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
+                  </SavedPostsProvider>
+                </ChatProvider>
+              </NotificationProvider>
+            </AuthProvider>
+          </GoogleOAuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

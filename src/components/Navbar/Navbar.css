@@ -2,24 +2,22 @@
    TOKENS
    ========================================================================== */
 .navbar-header {
-    --ink: #1c1815;
-    --ink-soft: #6b6259;
-    --ink-faint: #a39a8d;
-    --paper: #ffffff;
-    --paper-warm: #faf7f3;
-    --line: #ece6dc;
-    --line-strong: #ddd4c5;
+    --ink: var(--text-primary);
+    --ink-soft: var(--text-secondary);
+    --ink-faint: var(--text-muted);
+    --paper: var(--bg-surface);
+    --paper-warm: var(--bg-subtle);
+    --line: var(--border-color);
+    --line-strong: var(--border-strong);
 
-    --accent: #e2540e;
-    --accent-deep: #b8420a;
-    --accent-soft: #fff0e4;
+    --accent: var(--accent-color);
+    --accent-deep: var(--accent-strong);
 
     --trust: #2f3f8c;
     --trust-deep: #232f6b;
     --trust-soft: #eef1fb;
 
-    --danger: #e23b4e;
-    --danger-soft: #fdecee;
+    --danger: var(--danger-color);
 
     --r-sm: 8px;
     --r-md: 12px;
@@ -27,7 +25,7 @@
     --r-full: 999px;
 
     --shadow-sm: 0 2px 6px -2px rgba(28, 24, 21, 0.08);
-    --shadow-md: 0 10px 28px -6px rgba(28, 24, 21, 0.14), 0 3px 10px -3px rgba(28, 24, 21, 0.06);
+    --shadow-md: var(--shadow-surface);
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -38,7 +36,7 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    background-color: rgba(255, 255, 255, 0.92);
+    background-color: color-mix(in srgb, var(--bg-surface) 92%, transparent);
     backdrop-filter: blur(10px) saturate(1.4);
     -webkit-backdrop-filter: blur(10px) saturate(1.4);
     border-bottom: 1px solid var(--line);
@@ -331,6 +329,7 @@
     right: 0;
     top: calc(100% + 12px);
     background-color: var(--paper);
+    color: var(--ink);
     border-radius: var(--r-lg);
     box-shadow: var(--shadow-md);
     border: 1px solid var(--line);
@@ -338,7 +337,6 @@
     z-index: 1000;
 }
 
-/* Notch: ties the panel visually back to the button that opened it */
 .dropdown-menu::before,
 .dropdown-menu::after {
     content: '';
@@ -402,6 +400,7 @@
     padding: 13px 16px;
     border-bottom: 1px solid var(--line);
     background-color: var(--paper-warm);
+    color: var(--ink);
     font-size: 14px;
 }
 
@@ -425,6 +424,7 @@
 .popover-list {
     max-height: 320px;
     overflow-y: auto;
+    background-color: var(--paper);
 }
 
 .popover-item {
@@ -471,8 +471,6 @@
     overflow: hidden;
 }
 
-/* Price is the single most important fact for a rental listing —
-   pulled out as its own chip instead of plain trailing text. */
 .popover-price {
     display: inline-flex;
     align-items: center;
@@ -621,7 +619,6 @@
     align-items: center;
     justify-content: space-between;
     padding: 9px 16px;
-    color: #334155;
     color: var(--ink);
     opacity: 0.85;
     font-size: 14px;
@@ -667,6 +664,62 @@
 
 .logout-item:hover {
     background-color: var(--danger-soft);
+}
+
+/* ==========================================================================
+   THEME TOGGLE SWITCH
+   ========================================================================== */
+.theme-toggle-row,
+.dropdown-item.theme-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s var(--ease);
+}
+
+.theme-toggle-row:hover,
+.dropdown-item.theme-toggle-row:hover {
+    background-color: var(--paper-warm, var(--bg-primary, #faf7f3));
+    padding-left: 16px;
+    /* Giữ cố định lề trái không nhích animation */
+}
+
+.theme-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--ink, var(--text-primary, #1c1815));
+}
+
+.theme-switch {
+    width: 38px;
+    height: 20px;
+    background-color: var(--border-strong);
+    border-radius: var(--r-full, 999px);
+    position: relative;
+    padding: 2px;
+    transition: background-color 0.25s var(--ease, ease);
+}
+
+.theme-switch.active {
+    background-color: var(--accent-color);
+}
+
+.theme-switch-thumb {
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.25s var(--ease, ease);
+}
+
+.theme-switch.active .theme-switch-thumb {
+    transform: translateX(18px);
 }
 
 /* Icon colors */
@@ -766,4 +819,13 @@
     .dropdown-user-menu::after {
         right: 26px;
     }
+}
+
+[data-theme='dark'] .navbar-header {
+    background-color: color-mix(in srgb, var(--bg-surface) 88%, transparent);
+}
+
+[data-theme='dark'] .logo-icon-wrapper,
+[data-theme='dark'] .btn-post {
+    box-shadow: 0 6px 18px -6px rgba(251, 146, 60, 0.55);
 }

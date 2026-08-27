@@ -279,6 +279,31 @@ export const createRoomPost = async (roomData: any, token?: string): Promise<any
   return response.json();
 };
 
+export const uploadRoomImages = async (files: File[], token?: string): Promise<string[]> => {
+  const jwt = getToken(token);
+  if (!jwt) throw new Error('Vui lòng đăng nhập để upload ảnh');
+  if (!files.length) return [];
+
+  const formData = new FormData();
+  files.forEach((file) => formData.append('images', file));
+
+  const response = await fetch(`${API_URL}/api/rooms/images`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Upload ảnh thất bại. Vui lòng thử lại.');
+  }
+
+  const result = await response.json();
+  return Array.isArray(result.urls) ? result.urls : [];
+};
+
 export const updateRoomPost = async (
   roomId: number | string,
   roomData: any,
