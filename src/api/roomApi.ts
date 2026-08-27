@@ -226,6 +226,53 @@ export const submitReview = async (
   return response.json();
 };
 
+export type RoomReviewSort = 'latest' | 'rating_desc' | 'rating_asc';
+export type RoomReviewFilter = 'all' | 'with_reply';
+
+export const getRoomReviews = async (
+  roomId: number | string,
+  options: { sort?: RoomReviewSort; filter?: RoomReviewFilter } = {}
+): Promise<any[]> => {
+  try {
+    const query = new URLSearchParams();
+    if (options.sort) query.set('sort', options.sort);
+    if (options.filter) query.set('filter', options.filter);
+
+    const response = await fetch(`${API_URL}/api/reviews/room/${roomId}?${query.toString()}`, {
+      cache: 'no-store',
+    });
+
+    if (!response.ok) return [];
+    const result = await response.json();
+    return Array.isArray(result) ? result : [];
+  } catch (error) {
+    console.error('Lỗi khi tải danh sách đánh giá:', error);
+    return [];
+  }
+};
+
+export const replyToReviewAsOwner = async (
+  reviewId: number | string,
+  reply: string,
+  token?: string
+): Promise<any> => {
+  const jwt = getToken(token);
+  if (!jwt) throw new Error('Vui long dang nhap de phan hoi danh gia');
+
+  const response = await fetch(`${API_URL}/api/reviews/${reviewId}/owner-reply`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(jwt),
+    body: JSON.stringify({ reply }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Phan hoi danh gia that bai');
+  }
+
+  return response.json();
+};
+
 export const getMyReviews = async (token?: string): Promise<any[]> => {
   const jwt = getToken(token);
   if (!jwt) return [];

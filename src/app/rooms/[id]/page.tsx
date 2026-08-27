@@ -40,7 +40,16 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Room } from '@/types/room';
-import { deleteRoomPost, getRoomById, recordRoomView } from '@/api/roomApi';
+import {
+  deleteRoomPost,
+  getRoomById,
+  getRoomReviews,
+  recordRoomView,
+  replyToReviewAsOwner,
+  submitReview,
+  type RoomReviewFilter,
+  type RoomReviewSort,
+} from '@/api/roomApi';
 import { createOrGetConversation } from '@/api/chatApi';
 import { createReportApi } from '@/api/reportApi';
 import { useAuth } from '@/context/AuthContext';
@@ -49,6 +58,23 @@ import { useSavedPosts } from '@/context/SavedPostsContext';
 import './page.css';
 
 const PLACEHOLDER_IMAGE = '/placeholder-room.jpg';
+
+type RoomReview = {
+  id: number;
+  user_id: number;
+  room_id: number;
+  rating: number;
+  comment?: string | null;
+  owner_reply?: string | null;
+  owner_reply_at?: string | null;
+  created_at?: string | null;
+  verified_interaction?: boolean;
+  user?: {
+    id?: number;
+    full_name?: string | null;
+    avatar?: string | null;
+  };
+};
 
 const normalizeText = (value: string) =>
   value
@@ -278,6 +304,15 @@ export default function RoomDetailPage() {
   const [reportReason, setReportReason] = useState('');
   const [submittingReport, setSubmittingReport] = useState(false);
   const [deletingRoom, setDeletingRoom] = useState(false);
+  const [roomReviews, setRoomReviews] = useState<RoomReview[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewSort, setReviewSort] = useState<RoomReviewSort>('latest');
+  const [reviewFilter, setReviewFilter] = useState<RoomReviewFilter>('all');
+  const [replyDrafts, setReplyDrafts] = useState<Record<number, string>>({});
+  const [submittingReplyId, setSubmittingReplyId] = useState<number | null>(null);
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [newReviewComment, setNewReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   const numericRoomId = Number(params?.id);
   const hasRecordedRef = useRef(false);
@@ -300,6 +335,16 @@ export default function RoomDetailPage() {
       .catch((err) => console.error('Lỗi lấy thông tin phòng:', err))
       .finally(() => setLoading(false));
   }, [numericRoomId]);
+
+  useEffect(() => {
+    if (!numericRoomId) return;
+
+    setReviewsLoading(true);
+    getRoomReviews(numericRoomId, { sort: reviewSort, filter: reviewFilter })
+      .then((reviews) => setRoomReviews(reviews))
+      .catch((err) => console.error('Loi tai danh sach danh gia:', err))
+      .finally(() => setReviewsLoading(false));
+  }, [numericRoomId, reviewSort, reviewFilter]);
 
   const getOwnerId = () => {
     return room?.user?.id || room?.userId || room?.user_id;
@@ -389,6 +434,58 @@ export default function RoomDetailPage() {
   if (loading) return <div className="detail-loading">Đang tải thông tin phòng...</div>;
   if (!room) return <div className="detail-loading">Không tìm thấy phòng trọ này.</div>;
 
+  const handleOwnerReply = async (reviewId: number) => {
+    const reply = replyDrafts[reviewId]?.trim();
+    if (!reply) {
+      alert('Vui lòng nhập nội dung phải hồi.');
+      return;
+    }
+
+    try {
+      setSubmittingReplyId(reviewId);
+      await replyToReviewAsOwner(reviewId, reply);
+      const nextReviews = await getRoomReviews(numericRoomId, { sort: reviewSort, filter: reviewFilter });
+      setRoomReviews(nextReviews);
+      setReplyDrafts((prev) => ({ ...prev, [reviewId]: '' }));
+    } catch (error: any) {
+      alert(error.message || 'Không thể phản hồi đánh giá. Vui lòng thử lại.');
+    } finally {
+      setSubmittingReplyId(null);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!user) {
+      alert('Vui lòng đăng nhập để gửi đánh giá.');
+      router.push('/login');
+      return;
+    }
+
+    if (isOwner) {
+      alert('Bạn không thể tự đánh giá bài đăng của chính mình.');
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+      await submitReview({
+        room_id: numericRoomId,
+        rating: newReviewRating,
+        comment: newReviewComment.trim(),
+      });
+      setNewReviewComment('');
+      setNewReviewRating(5);
+      setReviewSort('latest');
+      setReviewFilter('all');
+      const nextReviews = await getRoomReviews(numericRoomId, { sort: 'latest', filter: 'all' });
+      setRoomReviews(nextReviews);
+    } catch (error: any) {
+      alert(error.message || 'Không thể gửi đánh giá. Vui lòng thử lại.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   const imageList = getImageList(room);
   const amenities = getAmenities(room);
   const ownerId = getOwnerId();
@@ -401,6 +498,10 @@ export default function RoomDetailPage() {
   const locationText = [room.address, room.district_name || room.district, room.city_name || room.city]
     .filter(Boolean)
     .join(', ');
+  const averageRating = roomReviews.length
+    ? roomReviews.reduce((total, review) => total + Number(review.rating || 0), 0) / roomReviews.length
+    : 0;
+  const averageRatingLabel = averageRating ? averageRating.toFixed(1) : 'Chưa có';
 
   return (
     <div className="room-detail-container">
@@ -499,6 +600,158 @@ export default function RoomDetailPage() {
             <div className="description-text">
               {room.content || room.description || 'Chưa có mô tả chi tiết.'}
             </div>
+          </section>
+
+          <section className="detail-section reviews-section">
+            <div className="reviews-header">
+              <div className="section-heading">
+                <MessageSquare size={20} />
+                <h2>Đánh giá từ người thuê</h2>
+              </div>
+              <div className="reviews-summary">
+                <span className="rating-score">{averageRatingLabel}</span>
+                <span>{roomReviews.length} Đánh giá</span>
+              </div>
+            </div>
+
+            {!isOwner && (
+              <div className="review-compose">
+                <div className="compose-row">
+                  <label>
+                    Điểm đánh giá
+                    <select
+                      value={newReviewRating}
+                      onChange={(event) => setNewReviewRating(Number(event.target.value))}
+                    >
+                      <option value={5}>5/5 - Rất tốt</option>
+                      <option value={4}>4/5 - Tốt</option>
+                      <option value={3}>3/5 - Trung bình</option>
+                      <option value={2}>2/5 - Kém</option>
+                      <option value={1}>1/5 - Rất kém</option>
+                    </select>
+                  </label>
+                </div>
+
+                <textarea
+                  rows={4}
+                  value={newReviewComment}
+                  onChange={(event) => setNewReviewComment(event.target.value)}
+                  placeholder="Chia sẻ trải nghiệm của bạn về phòng này..."
+                />
+
+                <button
+                  type="button"
+                  onClick={handleSubmitReview}
+                  disabled={submittingReview}
+                >
+                  {submittingReview ? 'Đang gửi đánh giá...' : 'Gửi đánh giá'}
+                </button>
+              </div>
+            )}
+
+            <div className="reviews-toolbar">
+              <label>
+                Sắp xếp
+                <select
+                  value={reviewSort}
+                  onChange={(event) => setReviewSort(event.target.value as RoomReviewSort)}
+                >
+                  <option value="latest">Mới nhất</option>
+                  <option value="rating_desc">Đánh giá cao nhất</option>
+                  <option value="rating_asc">Đánh giá thấp nhất</option>
+                </select>
+              </label>
+
+              <label>
+                Bỏ lọc
+                <select
+                  value={reviewFilter}
+                  onChange={(event) => setReviewFilter(event.target.value as RoomReviewFilter)}
+                >
+                  <option value="all">Tất cả bình luận</option>
+                  <option value="with_reply">Có phản hồi từ chủ nhà</option>
+                </select>
+              </label>
+            </div>
+
+            {reviewsLoading ? (
+              <div className="reviews-empty">Đang tải danh sách đánh giá...</div>
+            ) : roomReviews.length > 0 ? (
+              <div className="reviews-list">
+                {roomReviews.map((review) => {
+                  const reviewerName = review.user?.full_name || 'Người dùng';
+                  const reviewerInitial = reviewerName.trim().charAt(0).toUpperCase() || 'U';
+                  const replyDraft = replyDrafts[review.id] ?? review.owner_reply ?? '';
+
+                  return (
+                    <article className="review-card" key={review.id}>
+                      <div className="review-topline">
+                        <div className="reviewer-block">
+                          {review.user?.avatar ? (
+                            <img src={review.user.avatar} alt={reviewerName} className="reviewer-avatar" />
+                          ) : (
+                            <span className="reviewer-avatar reviewer-avatar-fallback">{reviewerInitial}</span>
+                          )}
+                          <div>
+                            <div className="reviewer-name-row">
+                              <span className="reviewer-name">{reviewerName}</span>
+                              {review.verified_interaction && (
+                                <span className="real-renter-badge">
+                                  <ShieldCheck size={13} /> Đã từng xem / liên hệ
+                                </span>
+                              )}
+                            </div>
+                            <span className="review-date">{formatPostedDate(parseDatabaseDate(review.created_at || undefined))}</span>
+                          </div>
+                        </div>
+
+                        <div className="review-rating" aria-label={`${review.rating} trên 5 điểm`}>
+                          {Number(review.rating || 0)}/5
+                        </div>
+                      </div>
+
+                      <p className="review-comment">{review.comment || 'Người dùng chưa để lại nội dung bình luận.'}</p>
+
+                      {review.owner_reply && (
+                        <div className="owner-reply-box">
+                          <span className="owner-reply-label">Phản hồi từ chủ nhà</span>
+                          <p>{review.owner_reply}</p>
+                          {review.owner_reply_at && (
+                            <span className="review-date">
+                              {formatPostedDate(parseDatabaseDate(review.owner_reply_at))}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {isOwner && (
+                        <div className="owner-reply-form">
+                          <textarea
+                            rows={3}
+                            value={replyDraft}
+                            onChange={(event) =>
+                              setReplyDrafts((prev) => ({ ...prev, [review.id]: event.target.value }))
+                            }
+                            placeholder="Viết phản hồi ngắn gọn cho đánh giá này..."
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleOwnerReply(review.id)}
+                            disabled={submittingReplyId === review.id}
+                          >
+                            {submittingReplyId === review.id ? 'Đang gửi...' : review.owner_reply ? 'Cập nhật phản hồi' : 'Phản hồi'}
+                          </button>
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="reviews-empty">
+                Chưa có đánh giá phù hợp với bộ lọc hiện tại.
+              </div>
+            )}
           </section>
         </div>
 
