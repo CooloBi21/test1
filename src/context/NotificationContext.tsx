@@ -68,7 +68,16 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 
     fetchInitialData();
 
-    const newSocket = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000');
+    // Lấy SOCKET_URL chuẩn (loại bỏ hậu tố /api nếu lỡ dùng chung API_URL)
+    const socketUrl = 
+      process.env.NEXT_PUBLIC_SOCKET_URL || 
+      process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, '') || 
+      'http://localhost:5000';
+
+    const newSocket = io(socketUrl, {
+      transports: ['websocket'],
+    });
+
     setSocket(newSocket);
 
     newSocket.emit('joinUser', user.id);

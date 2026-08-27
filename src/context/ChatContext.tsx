@@ -39,7 +39,16 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
     fetchUnread();
 
-    const newSocket = io('http://localhost:5000');
+    // Chuẩn hóa URL Socket và ưu tiên chuyển từ HTTPS/API URL về root URL
+    const socketUrl =
+      process.env.NEXT_PUBLIC_SOCKET_URL ||
+      process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, '') ||
+      'http://localhost:5000';
+
+    const newSocket = io(socketUrl, {
+      transports: ['websocket'],
+    });
+
     setSocket(newSocket);
 
     newSocket.emit('joinUser', user.id);
