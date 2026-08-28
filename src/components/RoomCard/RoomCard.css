@@ -49,7 +49,7 @@
     background: color-mix(in srgb, var(--accent-color) 88%, #ffffff);
     color: #ffffff;
     font-size: 10.5px;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1;
     letter-spacing: 0.3px;
     padding: 5px 8px;
@@ -102,7 +102,7 @@
     margin: 0 0 6px 0;
     font-size: 15px;
     line-height: 1.35;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .room-card .room-title a {
@@ -125,7 +125,7 @@
 .room-card .room-price {
     color: var(--success-color);
     font-size: 17px;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .room-card .price-unit {
@@ -138,7 +138,7 @@
     background-color: var(--accent-soft);
     color: var(--accent-strong);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     padding: 2px 8px;
     border-radius: 4px;
     border: 1px solid var(--border-color);
@@ -185,7 +185,7 @@
 
 .view-detail-link {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--accent-strong);
     text-decoration: none;
 }
@@ -236,7 +236,7 @@
     background: linear-gradient(135deg, var(--accent-color), var(--accent-strong));
     color: #ffffff;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .author-avatar-img {
@@ -248,7 +248,7 @@
     min-width: 0;
     color: var(--text-primary);
     font-size: 12.5px;
-    font-weight: 700;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

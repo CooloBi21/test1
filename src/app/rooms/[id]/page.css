@@ -134,7 +134,7 @@
   background: var(--accent-soft);
   color: var(--accent-strong);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   margin-bottom: 16px;
@@ -142,7 +142,7 @@
 
 .room-title {
   font-size: clamp(24px, 3vw, 36px);
-  font-weight: 850;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0 0 14px;
   line-height: 1.2;
@@ -190,12 +190,12 @@
 .stat-item .label {
   font-size: 12px;
   color: var(--text-secondary);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .stat-item .value {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
@@ -256,7 +256,7 @@
 .section-heading h2 {
   margin: 0;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
@@ -277,7 +277,7 @@
   border-radius: 12px;
   color: var(--text-primary);
   font-size: 14px;
-  font-weight: 650;
+  font-weight: 500;
 }
 
 .amenity-item svg,
@@ -317,7 +317,7 @@
   background: var(--accent-soft);
   color: var(--accent-strong);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .host-header {
@@ -342,7 +342,7 @@
 
 .host-name {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -359,7 +359,7 @@
   font-size: 11px;
   padding: 4px 8px;
   border-radius: 999px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .host-sub {
@@ -384,7 +384,7 @@
   padding: 12px 14px;
   border-radius: 12px;
   border: none;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 14px;
   cursor: pointer;
   display: inline-flex;
@@ -499,7 +499,7 @@
   background: var(--accent-soft);
   color: var(--accent-strong);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .rating-score {
@@ -519,7 +519,7 @@
   gap: 8px;
   color: var(--text-secondary);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .reviews-toolbar select {
@@ -530,7 +530,7 @@
   color: var(--text-primary);
   padding: 0 12px;
   font: inherit;
-  font-weight: 700;
+  font-weight: 500;
   outline: none;
 }
 
@@ -554,7 +554,7 @@
   gap: 8px;
   color: var(--text-secondary);
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .review-compose select,
@@ -570,7 +570,7 @@
 .review-compose select {
   min-height: 38px;
   padding: 0 12px;
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .review-compose textarea {
@@ -593,7 +593,7 @@
   background: var(--accent-color);
   color: #ffffff;
   padding: 0 16px;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -639,7 +639,7 @@
   color: var(--text-secondary);
   padding: 5px 9px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .reviews-list {
@@ -681,7 +681,7 @@
   background: linear-gradient(135deg, var(--accent-color), var(--accent-strong));
   color: #ffffff;
   font-size: 15px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .reviewer-name-row {
@@ -691,7 +691,7 @@
 
 .reviewer-name {
   color: var(--text-primary);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .real-renter-badge {
@@ -704,7 +704,7 @@
   color: var(--success-color);
   border: 1px solid color-mix(in srgb, var(--success-color) 28%, var(--border-color));
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .review-date {
@@ -721,7 +721,7 @@
   background: color-mix(in srgb, var(--accent-color) 12%, var(--bg-surface));
   color: var(--accent-strong);
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .review-comment {
@@ -773,7 +773,7 @@
   color: var(--text-secondary);
   padding: 0 10px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
   transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
@@ -822,7 +822,7 @@
   margin-bottom: 5px;
   color: var(--accent-strong);
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .owner-reply-box p {
@@ -862,7 +862,7 @@
   background: var(--accent-color);
   color: #ffffff;
   padding: 0 14px;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -877,7 +877,7 @@
   background: var(--bg-muted);
   color: var(--text-secondary);
   text-align: center;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* =========================================
@@ -953,7 +953,7 @@
   min-height: 40px;
   border-radius: 10px;
   padding: 0 16px;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
   border: 1px solid var(--border-color);
 }

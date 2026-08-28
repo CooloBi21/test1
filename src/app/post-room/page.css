@@ -10,7 +10,7 @@
 
 .post-room-title {
     font-size: 28px;
-    font-weight: 850;
+    font-weight: 700;
     color: var(--text-primary);
     display: flex;
     align-items: center;
@@ -39,7 +39,7 @@
 
 .form-group label {
     display: block;
-    font-weight: 750;
+    font-weight: 600;
     font-size: 14px;
     color: var(--text-primary);
     margin-bottom: 8px;
@@ -97,7 +97,7 @@ textarea.form-control {
     align-items: center;
     justify-content: center;
     gap: 16px;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: inherit;
     transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -195,7 +195,7 @@ textarea.form-control {
     gap: 8px;
     color: var(--text-primary);
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 600;
     margin-bottom: 10px;
 }
 
@@ -216,7 +216,7 @@ textarea.form-control {
     padding: 0 16px;
     background: var(--text-primary);
     color: var(--bg-primary);
-    font-weight: 800;
+    font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
     transition: opacity 0.2s ease, transform 0.2s ease;
@@ -259,7 +259,7 @@ textarea.form-control {
     background: rgba(15, 23, 42, 0.72);
     color: #ffffff;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .image-source-badge.local {
@@ -296,7 +296,7 @@ textarea.form-control {
     border: 1px solid var(--border-color);
     background: var(--bg-muted);
     color: var(--text-secondary);
-    font-weight: 750;
+    font-weight: 600;
     font-size: 13px;
     cursor: pointer;
     display: flex;
@@ -334,7 +334,7 @@ textarea.form-control {
     color: #ffffff;
     padding: 14px;
     border-radius: 12px;
-    font-weight: 850;
+    font-weight: 700;
     font-size: 16px;
     border: none;
     cursor: pointer;

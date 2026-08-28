@@ -22,7 +22,7 @@
   gap: 10px;
   color: #0f172a;
   font-size: clamp(1.6rem, 2.5vw, 2.1rem);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .settings-header p {
