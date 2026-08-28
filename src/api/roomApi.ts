@@ -209,6 +209,30 @@ export const clearAllHistory = async (token?: string): Promise<void> => {
    4. ĐÁNH GIÁ (REVIEWS)
    ========================================================================== */
 
+export type ReviewReactionType = 'helpful' | 'like' | 'trusted';
+
+export const toggleReviewReaction = async (
+  reviewId: number | string,
+  type: ReviewReactionType,
+  token?: string
+): Promise<{ reactions?: Record<string, number>; active?: boolean }> => {
+  const jwt = getToken(token);
+  if (!jwt) throw new Error('Vui lòng đăng nhập để thực hiện');
+
+  const response = await fetch(`${API_URL}/api/reviews/${reviewId}/reactions`, {
+    method: 'POST',
+    headers: getAuthHeaders(jwt),
+    body: JSON.stringify({ type }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Thao tác thả cảm xúc thất bại');
+  }
+
+  return response.json();
+};
+
 export const submitReview = async (
   data: { room_id: number; rating: number; comment?: string; images?: string[] },
   token?: string
@@ -231,12 +255,13 @@ export type RoomReviewFilter = 'all' | 'with_reply';
 
 export const getRoomReviews = async (
   roomId: number | string,
-  options: { sort?: RoomReviewSort; filter?: RoomReviewFilter } = {}
+  options: { sort?: RoomReviewSort; filter?: RoomReviewFilter; viewerId?: number | string } = {}
 ): Promise<any[]> => {
   try {
     const query = new URLSearchParams();
     if (options.sort) query.set('sort', options.sort);
     if (options.filter) query.set('filter', options.filter);
+    if (options.viewerId) query.set('viewerId', String(options.viewerId));
 
     const response = await fetch(`${API_URL}/api/reviews/room/${roomId}?${query.toString()}`, {
       cache: 'no-store',
