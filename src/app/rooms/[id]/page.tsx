@@ -87,9 +87,9 @@ const REVIEW_REACTIONS: Array<{
   icon: string;
   label: string;
 }> = [
-  { type: 'helpful', icon: 'ðŸ‘', label: 'Há»¯u Ã­ch' },
-  { type: 'like', icon: 'â¤ï¸', label: 'ThÃ­ch' },
-  { type: 'trusted', icon: 'ðŸŽ¯', label: 'Uy tÃ­n' },
+  { type: 'helpful', icon: '👍', label: 'Hữu ích' },
+  { type: 'like', icon: '❤️', label: 'Thích' },
+  { type: 'trusted', icon: '🎯', label: 'Uy tín' },
 ];
 
 const normalizeText = (value: string) =>
@@ -185,14 +185,14 @@ const getAmenityIcon = (label: string): LucideIcon => {
 
 const formatPrice = (price: Room['price']) => {
   const numericPrice = Number(price || 0);
-  if (!Number.isFinite(numericPrice) || numericPrice <= 0) return 'Thá»a thuáº­n';
-  return `${numericPrice.toLocaleString('vi-VN')} Ä‘/thÃ¡ng`;
+  if (!Number.isFinite(numericPrice) || numericPrice <= 0) return 'Thỏa thuận';
+  return `${numericPrice.toLocaleString('vi-VN')} đ/tháng`;
 };
 
 const formatArea = (area: Room['area']) => {
   const numericArea = Number(area || 0);
-  if (!Number.isFinite(numericArea) || numericArea <= 0) return 'ChÆ°a cáº­p nháº­t';
-  return `${numericArea.toLocaleString('vi-VN')} mÂ²`;
+  if (!Number.isFinite(numericArea) || numericArea <= 0) return 'Chưa cập nhật';
+  return `${numericArea.toLocaleString('vi-VN')} m²`;
 };
 
 const VIETNAM_TIME_OFFSET_MS = 7 * 60 * 60 * 1000;
@@ -251,58 +251,58 @@ const toVietnamDateParts = (date: Date | null) => {
 };
 
 const formatPostedDate = (date: Date | null) => {
-  if (!date) return 'ChÆ°a cÃ³ ngÃ y Ä‘Äƒng';
+  if (!date) return 'Chưa có ngày đăng';
   const parts = toVietnamDateParts(date);
-  return parts ? `${parts.day}/${parts.month}/${parts.year}` : 'ChÆ°a cÃ³ ngÃ y Ä‘Äƒng';
+  return parts ? `${parts.day}/${parts.month}/${parts.year}` : 'Chưa có ngày đăng';
 };
 
 const formatPostedTime = (date: Date | null) => {
-  if (!date) return 'BÃ i Ä‘Äƒng cÅ© chÆ°a cÃ³ dá»¯ liá»‡u thá»i gian';
+  if (!date) return 'Bài đăng cũ chưa có dữ liệu thời gian';
   const parts = toVietnamDateParts(date);
-  return parts ? `LÃºc ${parts.hour}:${parts.minute}` : 'BÃ i Ä‘Äƒng cÅ© chÆ°a cÃ³ dá»¯ liá»‡u thá»i gian';
+  return parts ? `Lúc ${parts.hour}:${parts.minute}` : 'Bài đăng cũ chưa có dữ liệu thời gian';
 };
 
 const formatRelativePostedDate = (date: Date | null) => {
   if (!date) return '';
 
   const diffMs = Date.now() - date.getTime();
-  if (diffMs < 0) return 'Vá»«a Ä‘Äƒng';
+  if (diffMs < 0) return 'Vừa đăng';
 
   const diffMinutes = Math.floor(diffMs / 60000);
-  if (diffMinutes < 1) return 'Vá»«a Ä‘Äƒng';
-  if (diffMinutes < 60) return `${diffMinutes} phÃºt trÆ°á»›c`;
+  if (diffMinutes < 1) return 'Vừa đăng';
+  if (diffMinutes < 60) return `${diffMinutes} phút trước`;
 
   const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours} giá» trÆ°á»›c`;
+  if (diffHours < 24) return `${diffHours} giờ trước`;
 
   const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 30) return `${diffDays} ngÃ y trÆ°á»›c`;
+  if (diffDays < 30) return `${diffDays} ngày trước`;
 
   const diffMonths = Math.floor(diffDays / 30);
-  if (diffMonths < 12) return `${diffMonths} thÃ¡ng trÆ°á»›c`;
+  if (diffMonths < 12) return `${diffMonths} tháng trước`;
 
   const diffYears = Math.floor(diffDays / 365);
-  return `${diffYears} nÄƒm trÆ°á»›c`;
+  return `${diffYears} năm trước`;
 };
 
 const getStatusText = (status?: string) => {
   switch (status) {
     case 'approved':
-      return 'ÄÃ£ duyá»‡t';
+      return 'Đã duyệt';
     case 'pending':
-      return 'Chá» duyá»‡t';
+      return 'Chờ duyệt';
     case 'rejected':
-      return 'Tá»« chá»‘i';
+      return 'Từ chối';
     default:
-      return 'Äang hiá»ƒn thá»‹';
+      return 'Đang hiển thị';
   }
 };
 
 const maskPhone = (phone?: string | null) => {
-  if (!phone) return 'ChÆ°a cáº­p nháº­t SÄT';
+  if (!phone) return 'Chưa cập nhật SĐT';
   const compact = phone.replace(/\s+/g, '');
   if (compact.length <= 4) return phone;
-  return `${compact.slice(0, 4)}.xxx.xxx (Hiá»‡n sá»‘)`;
+  return `${compact.slice(0, 4)}.xxx.xxx (Hiện số)`;
 };
 
 export default function RoomDetailPage() {
@@ -349,7 +349,7 @@ export default function RoomDetailPage() {
           recordRoomView(numericRoomId);
         }
       })
-      .catch((err) => console.error('Lá»—i láº¥y thÃ´ng tin phÃ²ng:', err))
+      .catch((err) => console.error('Lỗi lấy thông tin phòng:', err))
       .finally(() => setLoading(false));
   }, [numericRoomId]);
 
@@ -359,7 +359,7 @@ export default function RoomDetailPage() {
     setReviewsLoading(true);
     getRoomReviews(numericRoomId, { sort: reviewSort, filter: reviewFilter, viewerId: user?.id })
       .then((reviews) => setRoomReviews(reviews))
-      .catch((err) => console.error('Loi tai danh sach danh gia:', err))
+      .catch((err) => console.error('Lỗi tải danh sách đánh giá:', err))
       .finally(() => setReviewsLoading(false));
   }, [numericRoomId, reviewSort, reviewFilter, user?.id]);
 
@@ -369,14 +369,14 @@ export default function RoomDetailPage() {
 
   const handleContactLandlord = async () => {
     if (!user) {
-      alert('Vui lÃ²ng Ä‘Äƒng nháº­p Ä‘á»ƒ trao Ä‘á»•i vá»›i chá»§ nhÃ !');
+      alert('Vui lòng đăng nhập để trao đổi với chủ nhà!');
       router.push('/login');
       return;
     }
 
     const ownerId = getOwnerId();
     if (String(user.id) === String(ownerId)) {
-      alert('ÄÃ¢y lÃ  tin Ä‘Äƒng cá»§a chÃ­nh báº¡n!');
+      alert('Đây là tin đăng của chính bạn!');
       return;
     }
 
@@ -385,8 +385,8 @@ export default function RoomDetailPage() {
       await createOrGetConversation(ownerId, room.id);
       router.push('/chat');
     } catch (err) {
-      console.error('Lá»—i khi táº¡o cuá»™c trÃ² chuyá»‡n:', err);
-      alert('KhÃ´ng thá»ƒ táº¡o cuá»™c trÃ² chuyá»‡n vá»›i chá»§ nhÃ ');
+      console.error('Lỗi khi tạo cuộc trò chuyện:', err);
+      alert('Không thể tạo cuộc trò chuyện với chủ nhà');
     } finally {
       setSubmittingChat(false);
     }
@@ -394,30 +394,30 @@ export default function RoomDetailPage() {
 
   const handleDeleteRoom = async () => {
     if (!user) {
-      alert('Vui lÃ²ng Ä‘Äƒng nháº­p Ä‘á»ƒ xÃ³a bÃ i Ä‘Äƒng!');
+      alert('Vui lòng đăng nhập để xóa bài đăng!');
       router.push('/login');
       return;
     }
 
     const ownerId = getOwnerId();
     if (String(user.id) !== String(ownerId)) {
-      alert('Báº¡n khÃ´ng cÃ³ quyá»n xÃ³a bÃ i Ä‘Äƒng nÃ y.');
+      alert('Bạn không có quyền xóa bài đăng này.');
       return;
     }
 
     const confirmed = window.confirm(
-      'Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n xÃ³a bÃ i Ä‘Äƒng nÃ y khÃ´ng? HÃ nh Ä‘á»™ng nÃ y khÃ´ng thá»ƒ hoÃ n tÃ¡c.'
+      'Bạn có chắc chắn muốn xóa bài đăng này không? Hành động này không thể hoàn tác.'
     );
     if (!confirmed) return;
 
     try {
       setDeletingRoom(true);
       await deleteRoomPost(room.id);
-      alert('ÄÃ£ xÃ³a bÃ i Ä‘Äƒng thÃ nh cÃ´ng.');
+      alert('Đã xóa bài đăng thành công.');
       router.push('/profile');
     } catch (error: any) {
-      console.error('Lá»—i khi xÃ³a bÃ i Ä‘Äƒng:', error);
-      alert(error.message || 'KhÃ´ng thá»ƒ xÃ³a bÃ i Ä‘Äƒng. Vui lÃ²ng thá»­ láº¡i.');
+      console.error('Lỗi khi xóa bài đăng:', error);
+      alert(error.message || 'Không thể xóa bài đăng. Vui lòng thử lại.');
     } finally {
       setDeletingRoom(false);
     }
@@ -425,36 +425,36 @@ export default function RoomDetailPage() {
 
   const handleSendReport = async () => {
     if (!user) {
-      alert('Vui lÃ²ng Ä‘Äƒng nháº­p Ä‘á»ƒ gá»­i bÃ¡o cÃ¡o vi pháº¡m!');
+      alert('Vui lòng đăng nhập để gửi báo cáo vi phạm!');
       router.push('/login');
       return;
     }
 
     if (!reportReason.trim()) {
-      alert('Vui lÃ²ng nháº­p lÃ½ do bÃ¡o cÃ¡o');
+      alert('Vui lòng nhập lý do báo cáo');
       return;
     }
 
     try {
       setSubmittingReport(true);
       await createReportApi(numericRoomId, reportReason);
-      alert('BÃ¡o cÃ¡o cá»§a báº¡n Ä‘Ã£ Ä‘Æ°á»£c gá»­i thÃ nh cÃ´ng!');
+      alert('Báo cáo của bạn đã được gửi thành công!');
       setShowReportModal(false);
       setReportReason('');
     } catch (err: any) {
-      alert(err.response?.data?.message || 'CÃ³ lá»—i xáº£y ra khi gá»­i bÃ¡o cÃ¡o');
+      alert(err.response?.data?.message || 'Có lỗi xảy ra khi gửi báo cáo');
     } finally {
       setSubmittingReport(false);
     }
   };
 
-  if (loading) return <div className="detail-loading">Äang táº£i thÃ´ng tin phÃ²ng...</div>;
-  if (!room) return <div className="detail-loading">KhÃ´ng tÃ¬m tháº¥y phÃ²ng trá» nÃ y.</div>;
+  if (loading) return <div className="detail-loading">Đang tải thông tin phòng...</div>;
+  if (!room) return <div className="detail-loading">Không tìm thấy phòng trọ này.</div>;
 
   const imageList = getImageList(room);
   const amenities = getAmenities(room);
   const ownerId = getOwnerId();
-  const ownerName = room.user?.full_name || room.author_name || room.author?.full_name || 'Chá»§ bÃ i Ä‘Äƒng';
+  const ownerName = room.user?.full_name || room.author_name || room.author?.full_name || 'Chủ bài đăng';
   const ownerPhone = room.user?.phone;
   const isRoomSaved = isSaved(numericRoomId);
   const isOwner = user?.id !== undefined && ownerId !== undefined && String(user.id) === String(ownerId);
@@ -466,12 +466,12 @@ export default function RoomDetailPage() {
   const averageRating = roomReviews.length
     ? roomReviews.reduce((total, review) => total + Number(review.rating || 0), 0) / roomReviews.length
     : 0;
-  const averageRatingLabel = averageRating ? averageRating.toFixed(1) : 'ChÆ°a cÃ³';
+  const averageRatingLabel = averageRating ? averageRating.toFixed(1) : 'Chưa có';
 
   const handleOwnerReply = async (reviewId: number) => {
     const reply = replyDrafts[reviewId]?.trim();
     if (!reply) {
-      alert('Vui lÃ²ng nháº­p ná»™i dung pháº£i há»“i.');
+      alert('Vui lòng nhập nội dung phản hồi.');
       return;
     }
 
@@ -482,7 +482,7 @@ export default function RoomDetailPage() {
       setRoomReviews(nextReviews);
       setReplyDrafts((prev) => ({ ...prev, [reviewId]: '' }));
     } catch (error: any) {
-      alert(error.message || 'KhÃ´ng thá»ƒ pháº£n há»“i Ä‘Ã¡nh giÃ¡. Vui lÃ²ng thá»­ láº¡i.');
+      alert(error.message || 'Không thể phản hồi đánh giá. Vui lòng thử lại.');
     } finally {
       setSubmittingReplyId(null);
     }
@@ -490,13 +490,13 @@ export default function RoomDetailPage() {
 
   const handleSubmitReview = async () => {
     if (!user) {
-      alert('Vui lÃ²ng Ä‘Äƒng nháº­p Ä‘á»ƒ gá»­i Ä‘Ã¡nh giÃ¡.');
+      alert('Vui lòng đăng nhập để gửi đánh giá.');
       router.push('/login');
       return;
     }
 
     if (isOwner) {
-      alert('Báº¡n khÃ´ng thá»ƒ tá»± Ä‘Ã¡nh giÃ¡ bÃ i Ä‘Äƒng cá»§a chÃ­nh mÃ¬nh.');
+      alert('Bạn không thể tự đánh giá bài đăng của chính mình.');
       return;
     }
 
@@ -517,7 +517,7 @@ export default function RoomDetailPage() {
       const nextReviews = await getRoomReviews(numericRoomId, { sort: 'latest', filter: 'all', viewerId: user?.id });
       setRoomReviews(nextReviews);
     } catch (error: any) {
-      alert(error.message || 'KhÃ´ng thá»ƒ gá»­i Ä‘Ã¡nh giÃ¡. Vui lÃ²ng thá»­ láº¡i.');
+      alert(error.message || 'Không thể gửi đánh giá. Vui lòng thử lại.');
     } finally {
       setSubmittingReview(false);
     }
@@ -525,7 +525,7 @@ export default function RoomDetailPage() {
 
   const handleToggleReaction = async (reviewId: number, reactionType: ReviewReactionType) => {
     if (!user) {
-      alert('Vui lÃ²ng Ä‘Äƒng nháº­p Ä‘á»ƒ tháº£ cáº£m xÃºc.');
+      alert('Vui lòng đăng nhập để thả cảm xúc.');
       router.push('/login');
       return;
     }
@@ -546,7 +546,7 @@ export default function RoomDetailPage() {
         )
       );
     } catch (error: any) {
-      alert(error.message || 'KhÃ´ng thá»ƒ cáº­p nháº­t cáº£m xÃºc. Vui lÃ²ng thá»­ láº¡i.');
+      alert(error.message || 'Không thể cập nhật cảm xúc. Vui lòng thử lại.');
     }
   };
 
@@ -558,16 +558,16 @@ export default function RoomDetailPage() {
             <img src={selectedImage} alt={room.title} className="main-image" />
           </div>
           {imageList.length > 1 && (
-            <div className="thumbnail-list" aria-label="Danh sÃ¡ch áº£nh phÃ²ng">
+            <div className="thumbnail-list" aria-label="Danh sách ảnh phòng">
               {imageList.map((img: string, idx: number) => (
                 <button
                   key={`${img}-${idx}`}
                   type="button"
                   className={`thumb-btn ${selectedImage === img ? 'active' : ''}`}
                   onClick={() => setSelectedImage(img)}
-                  aria-label={`Xem áº£nh ${idx + 1}`}
+                  aria-label={`Xem ảnh ${idx + 1}`}
                 >
-                  <img src={img} alt={`áº¢nh phÃ²ng ${idx + 1}`} />
+                  <img src={img} alt={`Ảnh phòng ${idx + 1}`} />
                 </button>
               ))}
             </div>
@@ -577,33 +577,33 @@ export default function RoomDetailPage() {
         <div className="hero-summary">
           <div className="summary-eyebrow">
             <Home size={16} />
-            <span>Chi tiáº¿t phÃ²ng trá»</span>
+            <span>Chi tiết phòng trọ</span>
           </div>
           <h1 className="room-title">{room.title}</h1>
           <p className="room-address">
             <MapPin size={18} />
-            <span>{locationText || 'ChÆ°a cáº­p nháº­t Ä‘á»‹a chá»‰'}</span>
+            <span>{locationText || 'Chưa cập nhật địa chỉ'}</span>
           </p>
 
           <div className="stats-bar">
             <div className="stat-item">
               <Banknote size={18} />
-              <span className="label">GiÃ¡ thuÃª</span>
+              <span className="label">Giá thuê</span>
               <span className="value price">{formatPrice(room.price)}</span>
             </div>
             <div className="stat-item">
               <Ruler size={18} />
-              <span className="label">Diá»‡n tÃ­ch</span>
+              <span className="label">Diện tích</span>
               <span className="value">{formatArea(room.area)}</span>
             </div>
             <div className="stat-item posted-date-card">
               <CalendarDays size={18} />
               <div className="posted-date-content">
-                <span className="label">NgÃ y Ä‘Äƒng</span>
+                <span className="label">Ngày đăng</span>
                 <span className="value">{formatPostedDate(postedDate)}</span>
                 <span className="date-note">
                   {formatPostedTime(postedDate)}
-                  {relativePostedDate ? ` Â· ${relativePostedDate}` : ''}
+                  {relativePostedDate ? ` · ${relativePostedDate}` : ''}
                 </span>
               </div>
             </div>
@@ -616,7 +616,7 @@ export default function RoomDetailPage() {
           <section className="detail-section amenities-section">
             <div className="section-heading">
               <Sparkles size={20} />
-              <h2>Tiá»‡n Ã­ch phÃ²ng</h2>
+              <h2>Tiện ích phòng</h2>
             </div>
 
             {amenities.length > 0 ? (
@@ -634,7 +634,7 @@ export default function RoomDetailPage() {
             ) : (
               <div className="amenities-empty">
                 <CircleCheck size={20} />
-                Chá»§ bÃ i Ä‘Äƒng chÆ°a cáº­p nháº­t danh sÃ¡ch tiá»‡n Ã­ch cho phÃ²ng nÃ y.
+                Chủ bài đăng chưa cập nhật danh sách tiện ích cho phòng này.
               </div>
             )}
           </section>
@@ -642,10 +642,10 @@ export default function RoomDetailPage() {
           <section className="detail-section description-section">
             <div className="section-heading">
               <CircleCheck size={20} />
-              <h2>MÃ´ táº£ chi tiáº¿t</h2>
+              <h2>Mô tả chi tiết</h2>
             </div>
             <div className="description-text">
-              {room.content || room.description || 'ChÆ°a cÃ³ mÃ´ táº£ chi tiáº¿t.'}
+              {room.content || room.description || 'Chưa có mô tả chi tiết.'}
             </div>
           </section>
 
@@ -653,11 +653,11 @@ export default function RoomDetailPage() {
             <div className="reviews-header">
               <div className="section-heading">
                 <MessageSquare size={20} />
-                <h2>ÄÃ¡nh giÃ¡ tá»« ngÆ°á»i thuÃª</h2>
+                <h2>Đánh giá từ người thuê</h2>
               </div>
               <div className="reviews-summary">
                 <span className="rating-score">{averageRatingLabel}</span>
-                <span>{roomReviews.length} ÄÃ¡nh giÃ¡</span>
+                <span>{roomReviews.length} Đánh giá</span>
               </div>
             </div>
 
@@ -665,16 +665,16 @@ export default function RoomDetailPage() {
               <div className="review-compose">
                 <div className="compose-row">
                   <label>
-                    Äiá»ƒm Ä‘Ã¡nh giÃ¡
+                    Điểm đánh giá
                     <select
                       value={newReviewRating}
                       onChange={(event) => setNewReviewRating(Number(event.target.value))}
                     >
-                      <option value={5}>5/5 - Ráº¥t tá»‘t</option>
-                      <option value={4}>4/5 - Tá»‘t</option>
-                      <option value={3}>3/5 - Trung bÃ¬nh</option>
-                      <option value={2}>2/5 - KÃ©m</option>
-                      <option value={1}>1/5 - Ráº¥t kÃ©m</option>
+                      <option value={5}>5/5 - Rất tốt</option>
+                      <option value={4}>4/5 - Tốt</option>
+                      <option value={3}>3/5 - Trung bình</option>
+                      <option value={2}>2/5 - Kém</option>
+                      <option value={1}>1/5 - Rất kém</option>
                     </select>
                   </label>
                 </div>
@@ -683,12 +683,12 @@ export default function RoomDetailPage() {
                   rows={4}
                   value={newReviewComment}
                   onChange={(event) => setNewReviewComment(event.target.value)}
-                  placeholder="Chia sáº» tráº£i nghiá»‡m cá»§a báº¡n vá» phÃ²ng nÃ y..."
+                  placeholder="Chia sẻ trải nghiệm của bạn về phòng này..."
                 />
 
                 <div className="review-image-picker">
                   <label>
-                    ThÃªm áº£nh thá»±c táº¿
+                    Thêm ảnh thực tế
                     <input
                       type="file"
                       accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.bmp,.avif,.heic,.heif"
@@ -714,43 +714,43 @@ export default function RoomDetailPage() {
                   onClick={handleSubmitReview}
                   disabled={submittingReview}
                 >
-                  {submittingReview ? 'Äang gá»­i Ä‘Ã¡nh giÃ¡...' : 'Gá»­i Ä‘Ã¡nh giÃ¡'}
+                  {submittingReview ? 'Đang gửi đánh giá...' : 'Gửi đánh giá'}
                 </button>
               </div>
             )}
 
             <div className="reviews-toolbar">
               <label>
-                Sáº¯p xáº¿p
+                Sắp xếp
                 <select
                   value={reviewSort}
                   onChange={(event) => setReviewSort(event.target.value as RoomReviewSort)}
                 >
-                  <option value="latest">Má»›i nháº¥t</option>
-                  <option value="rating_desc">ÄÃ¡nh giÃ¡ cao nháº¥t</option>
-                  <option value="rating_asc">ÄÃ¡nh giÃ¡ tháº¥p nháº¥t</option>
+                  <option value="latest">Mới nhất</option>
+                  <option value="rating_desc">Đánh giá cao nhất</option>
+                  <option value="rating_asc">Đánh giá thấp nhất</option>
                 </select>
               </label>
 
               <label>
-                Bá» lá»c
+                Bỏ lọc
                 <select
                   value={reviewFilter}
                   onChange={(event) => setReviewFilter(event.target.value as RoomReviewFilter)}
                 >
-                  <option value="all">Táº¥t cáº£ bÃ¬nh luáº­n</option>
-                  <option value="with_reply">CÃ³ pháº£n há»“i tá»« chá»§ nhÃ </option>
-                  <option value="with_images">CÃ³ hÃ¬nh áº£nh</option>
+                  <option value="all">Tất cả bình luận</option>
+                  <option value="with_reply">Có phản hồi từ chủ nhà</option>
+                  <option value="with_images">Có hình ảnh</option>
                 </select>
               </label>
             </div>
 
             {reviewsLoading ? (
-              <div className="reviews-empty">Äang táº£i danh sÃ¡ch Ä‘Ã¡nh giÃ¡...</div>
+              <div className="reviews-empty">Đang tải danh sách đánh giá...</div>
             ) : roomReviews.length > 0 ? (
               <div className="reviews-list">
                 {roomReviews.map((review) => {
-                  const reviewerName = review.user?.full_name || 'NgÆ°á»i dÃ¹ng';
+                  const reviewerName = review.user?.full_name || 'Người dùng';
                   const reviewerInitial = reviewerName.trim().charAt(0).toUpperCase() || 'U';
                   const replyDraft = replyDrafts[review.id] ?? review.owner_reply ?? '';
                   const reviewImages = parseStringList(review.images);
@@ -769,7 +769,7 @@ export default function RoomDetailPage() {
                               <span className="reviewer-name">{reviewerName}</span>
                               {review.verified_interaction && (
                                 <span className="real-renter-badge">
-                                  <ShieldCheck size={13} /> ÄÃ£ tá»«ng xem / liÃªn há»‡
+                                  <ShieldCheck size={13} /> Đã từng xem / liên hệ
                                 </span>
                               )}
                             </div>
@@ -777,12 +777,12 @@ export default function RoomDetailPage() {
                           </div>
                         </div>
 
-                        <div className="review-rating" aria-label={`${review.rating} trÃªn 5 Ä‘iá»ƒm`}>
+                        <div className="review-rating" aria-label={`${review.rating} trên 5 điểm`}>
                           {Number(review.rating || 0)}/5
                         </div>
                       </div>
 
-                      <p className="review-comment">{review.comment || 'NgÆ°á»i dÃ¹ng chÆ°a Ä‘á»ƒ láº¡i ná»™i dung bÃ¬nh luáº­n.'}</p>
+                      <p className="review-comment">{review.comment || 'Người dùng chưa để lại nội dung bình luận.'}</p>
 
                       {reviewImages.length > 0 && (
                         <div className="review-image-grid">
@@ -794,13 +794,13 @@ export default function RoomDetailPage() {
                               rel="noreferrer"
                               className="review-image-thumb"
                             >
-                              <img src={imageUrl} alt={`áº¢nh Ä‘Ã¡nh giÃ¡ ${imageIndex + 1}`} />
+                              <img src={imageUrl} alt={`Ảnh đánh giá ${imageIndex + 1}`} />
                             </a>
                           ))}
                         </div>
                       )}
 
-                      <div className="review-reactions" aria-label="Cáº£m xÃºc cho Ä‘Ã¡nh giÃ¡">
+                      <div className="review-reactions" aria-label="Cảm xúc cho đánh giá">
                         {REVIEW_REACTIONS.map((reaction) => (
                           <button
                             key={reaction.type}
@@ -817,7 +817,7 @@ export default function RoomDetailPage() {
 
                       {review.owner_reply && (
                         <div className="owner-reply-box">
-                          <span className="owner-reply-label">Pháº£n há»“i tá»« chá»§ nhÃ </span>
+                          <span className="owner-reply-label">Phản hồi từ chủ nhà</span>
                           <p>{review.owner_reply}</p>
                           {review.owner_reply_at && (
                             <span className="review-date">
@@ -835,14 +835,14 @@ export default function RoomDetailPage() {
                             onChange={(event) =>
                               setReplyDrafts((prev) => ({ ...prev, [review.id]: event.target.value }))
                             }
-                            placeholder="Viáº¿t pháº£n há»“i ngáº¯n gá»n cho Ä‘Ã¡nh giÃ¡ nÃ y..."
+                            placeholder="Viết phản hồi ngắn gọn cho đánh giá này..."
                           />
                           <button
                             type="button"
                             onClick={() => handleOwnerReply(review.id)}
                             disabled={submittingReplyId === review.id}
                           >
-                            {submittingReplyId === review.id ? 'Äang gá»­i...' : review.owner_reply ? 'Cáº­p nháº­t pháº£n há»“i' : 'Pháº£n há»“i'}
+                            {submittingReplyId === review.id ? 'Đang gửi...' : review.owner_reply ? 'Cập nhật phản hồi' : 'Phản hồi'}
                           </button>
                         </div>
                       )}
@@ -852,7 +852,7 @@ export default function RoomDetailPage() {
               </div>
             ) : (
               <div className="reviews-empty">
-                ChÆ°a cÃ³ Ä‘Ã¡nh giÃ¡ phÃ¹ há»£p vá»›i bá»™ lá»c hiá»‡n táº¡i.
+                Chưa có đánh giá phù hợp với bộ lọc hiện tại.
               </div>
             )}
           </section>
@@ -875,12 +875,12 @@ export default function RoomDetailPage() {
                 <div className="host-name">
                   {ownerName}
                   {room.user?.is_verified && (
-                    <span className="verified-badge" title="TÃ i khoáº£n Ä‘Ã£ xÃ¡c thá»±c">
-                      <ShieldCheck size={15} /> Uy tÃ­n
+                    <span className="verified-badge" title="Tài khoản đã xác thực">
+                      <ShieldCheck size={15} /> Uy tín
                     </span>
                   )}
                 </div>
-                <span className="host-sub">Chá»§ bÃ i Ä‘Äƒng</span>
+                <span className="host-sub">Chủ bài đăng</span>
               </div>
             </div>
 
@@ -888,7 +888,7 @@ export default function RoomDetailPage() {
               {isOwner ? (
                 <>
                   <Link href={`/rooms/${room.id}/edit`} className="btn-edit">
-                    <Edit3 size={18} /> Chá»‰nh sá»­a tin Ä‘Äƒng nÃ y
+                    <Edit3 size={18} /> Chỉnh sửa tin đăng này
                   </Link>
                   <button
                     type="button"
@@ -897,7 +897,7 @@ export default function RoomDetailPage() {
                     disabled={deletingRoom}
                   >
                     <Trash2 size={18} />
-                    {deletingRoom ? 'Äang xÃ³a bÃ i Ä‘Äƒng...' : 'XÃ³a bÃ i Ä‘Äƒng nÃ y'}
+                    {deletingRoom ? 'Đang xóa bài đăng...' : 'Xóa bài đăng này'}
                   </button>
                 </>
               ) : (
@@ -907,7 +907,7 @@ export default function RoomDetailPage() {
                   disabled={submittingChat}
                 >
                   <MessageSquare size={18} />
-                  {submittingChat ? 'Äang káº¿t ná»‘i...' : 'Chat vá»›i chá»§ nhÃ '}
+                  {submittingChat ? 'Đang kết nối...' : 'Chat với chủ nhà'}
                 </button>
               )}
 
@@ -927,12 +927,12 @@ export default function RoomDetailPage() {
                 onClick={() => toggleSavePost(room)}
               >
                 <Heart size={16} fill={isRoomSaved ? 'currentColor' : 'none'} />
-                {isRoomSaved ? 'ÄÃ£ lÆ°u tin' : 'LÆ°u tin'}
+                {isRoomSaved ? 'Đã lưu tin' : 'Lưu tin'}
               </button>
 
               {!isOwner && (
                 <button className="btn-sub" onClick={() => setShowReportModal(true)}>
-                  <Flag size={16} /> BÃ¡o cÃ¡o
+                  <Flag size={16} /> Báo cáo
                 </button>
               )}
             </div>
@@ -947,23 +947,23 @@ export default function RoomDetailPage() {
               type="button"
               className="modal-close-btn"
               onClick={() => setShowReportModal(false)}
-              aria-label="ÄÃ³ng bÃ¡o cÃ¡o"
+              aria-label="Đóng báo cáo"
             >
               <X size={18} />
             </button>
             <div className="section-heading">
               <AlertTriangle size={20} />
-              <h2>BÃ¡o cÃ¡o bÃ i Ä‘Äƒng vi pháº¡m</h2>
+              <h2>Báo cáo bài đăng vi phạm</h2>
             </div>
             <p className="modal-desc">
-              HÃ£y mÃ´ táº£ rÃµ lÃ½ do nhÆ° thÃ´ng tin sai sá»± tháº­t, dáº¥u hiá»‡u lá»«a Ä‘áº£o, hÃ¬nh áº£nh khÃ´ng Ä‘Ãºng hoáº·c ná»™i dung khÃ´ng phÃ¹ há»£p.
+              Hãy mô tả rõ lý do như thông tin sai sự thật, dấu hiệu lừa đảo, hình ảnh không đúng hoặc nội dung không phù hợp.
             </p>
 
             <textarea
               rows={5}
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
-              placeholder="Nháº­p chi tiáº¿t lÃ½ do..."
+              placeholder="Nhập chi tiết lý do..."
               className="report-textarea"
             />
 
@@ -974,7 +974,7 @@ export default function RoomDetailPage() {
                 onClick={() => setShowReportModal(false)}
                 disabled={submittingReport}
               >
-                Há»§y
+                Hủy
               </button>
               <button
                 type="button"
@@ -982,7 +982,7 @@ export default function RoomDetailPage() {
                 onClick={handleSendReport}
                 disabled={submittingReport}
               >
-                {submittingReport ? 'Äang gá»­i...' : 'Gá»­i bÃ¡o cÃ¡o'}
+                {submittingReport ? 'Đang gửi...' : 'Gửi báo cáo'}
               </button>
             </div>
           </div>
