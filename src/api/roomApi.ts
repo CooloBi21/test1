@@ -210,7 +210,7 @@ export const clearAllHistory = async (token?: string): Promise<void> => {
    ========================================================================== */
 
 export const submitReview = async (
-  data: { room_id: number; rating: number; comment?: string },
+  data: { room_id: number; rating: number; comment?: string; images?: string[] },
   token?: string
 ): Promise<any> => {
   const jwt = getToken(token);
@@ -257,7 +257,7 @@ export const replyToReviewAsOwner = async (
   token?: string
 ): Promise<any> => {
   const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui long dang nhap de phan hoi danh gia');
+  if (!jwt) throw new Error('Vui lòng đăng nhập để phản hồi đánh giá');
 
   const response = await fetch(`${API_URL}/api/reviews/${reviewId}/owner-reply`, {
     method: 'PATCH',
@@ -267,7 +267,7 @@ export const replyToReviewAsOwner = async (
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'Phan hoi danh gia that bai');
+    throw new Error(errorData.message || 'Phản hồi đánh giá thất bại');
   }
 
   return response.json();
