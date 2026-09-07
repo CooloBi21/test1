@@ -62,7 +62,7 @@ export const getRooms = async (params: RoomFilterParams = {}): Promise<Room[]> =
 
     if (!response.ok) return [];
     const result = await response.json();
-    
+
     // Tự động giải bọc nếu backend trả về { total, data } hoặc array thuần
     if (result && Array.isArray(result.data)) {
       return result.data;
@@ -143,14 +143,14 @@ export const getSavedPosts = async (token?: string): Promise<any[]> => {
    3. LỊCH SỬ XEM (ROOM VIEWS)
    ========================================================================== */
 
-export const recordRoomView = async (roomId: number, token?: string): Promise<void> => {
-  const jwt = getToken(token);
-  if (!jwt) return;
-
+export const recordRoomView = async (roomId: number): Promise<void> => {
   try {
     await fetch(`${API_URL}/api/room-views`, {
       method: 'POST',
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ room_id: roomId }),
     });
   } catch (error) {
@@ -158,17 +158,18 @@ export const recordRoomView = async (roomId: number, token?: string): Promise<vo
   }
 };
 
-export const getViewHistory = async (token?: string): Promise<any[]> => {
-  const jwt = getToken(token);
-  if (!jwt) return [];
-
+export const getViewHistory = async (): Promise<any[]> => {
   try {
     const response = await fetch(`${API_URL}/api/room-views`, {
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       cache: 'no-store',
     });
 
     if (!response.ok) return [];
+
     const data = await response.json();
     return Array.isArray(data) ? data : [];
   } catch (error) {
@@ -177,28 +178,28 @@ export const getViewHistory = async (token?: string): Promise<any[]> => {
   }
 };
 
-export const deleteHistoryItem = async (roomId: number, token?: string): Promise<void> => {
-  const jwt = getToken(token);
-  if (!jwt) return;
-
+export const deleteHistoryItem = async (roomId: number): Promise<void> => {
   try {
     await fetch(`${API_URL}/api/room-views/${roomId}`, {
       method: 'DELETE',
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
   } catch (error) {
     console.error('Lỗi xóa lịch sử:', error);
   }
 };
 
-export const clearAllHistory = async (token?: string): Promise<void> => {
-  const jwt = getToken(token);
-  if (!jwt) return;
-
+export const clearAllHistory = async (): Promise<void> => {
   try {
     await fetch(`${API_URL}/api/room-views`, {
       method: 'DELETE',
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
   } catch (error) {
     console.error('Lỗi xóa toàn bộ lịch sử:', error);
@@ -347,7 +348,7 @@ export const createRoomPost = async (roomData: any, token?: string): Promise<any
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || 'Đăng tin thất bại. Vui lòng thử lại.');
   }
-  
+
   return response.json();
 };
 
