@@ -89,48 +89,58 @@ export const getRoomById = async (id: number | string): Promise<Room | null> => 
    2. TIN ĐÃ LƯU (SAVED POSTS)
    ========================================================================== */
 
-export const toggleSavePost = async (roomId: number, token?: string): Promise<{ saved: boolean }> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để thực hiện chức năng này');
-
+export const toggleSavePost = async (
+  roomId: number,
+): Promise<{ saved: boolean }> => {
   const response = await fetch(`${API_URL}/api/saved-posts`, {
     method: 'POST',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ room_id: roomId }),
   });
 
-  if (!response.ok) throw new Error('Thao tác lưu bài viết thất bại');
+  if (!response.ok) {
+    throw new Error('Thao tác lưu bài viết thất bại');
+  }
+
   return response.json();
 };
 
-export const checkIsSaved = async (roomId: number, token?: string): Promise<boolean> => {
-  const jwt = getToken(token);
-  if (!jwt) return false;
-
+export const checkIsSaved = async (roomId: number): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_URL}/api/saved-posts/check/${roomId}`, {
-      headers: getAuthHeaders(jwt),
-      cache: 'no-store',
-    });
+    const response = await fetch(
+      `${API_URL}/api/saved-posts/check/${roomId}`,
+      {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+      },
+    );
 
     if (!response.ok) return false;
+
     return await response.json();
   } catch {
     return false;
   }
 };
 
-export const getSavedPosts = async (token?: string): Promise<any[]> => {
-  const jwt = getToken(token);
-  if (!jwt) return [];
-
+export const getSavedPosts = async (): Promise<any[]> => {
   try {
     const response = await fetch(`${API_URL}/api/saved-posts`, {
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       cache: 'no-store',
     });
 
     if (!response.ok) return [];
+
     const data = await response.json();
     return Array.isArray(data) ? data : [];
   } catch (error) {
