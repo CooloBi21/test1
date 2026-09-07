@@ -7,7 +7,7 @@ import { Settings, User, Lock, Bell, Check, AlertCircle, KeyRound, Save } from '
 import './page.css';
 
 export default function SettingsPage() {
-  const { user, login } = useAuth();
+  const { user } = useAuth();
 
   // State Cập nhật Profile
   const [fullName, setFullName] = useState('');
@@ -36,16 +36,13 @@ export default function SettingsPage() {
     setProfileLoading(true);
 
     try {
-      const token = localStorage.getItem('access_token');
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await axios.put(
+      await axios.put(
         `${apiUrl}/auth/profile`,
         { full_name: fullName, phone },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
 
-      // Đồng bộ lại AuthContext & LocalStorage
-      login(token!, res.data);
       setProfileMsg({ type: 'success', text: 'Cập nhật thông tin thành công!' });
     } catch (error: any) {
       setProfileMsg({
@@ -70,12 +67,11 @@ export default function SettingsPage() {
     setPassLoading(true);
 
     try {
-      const token = localStorage.getItem('access_token');
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       await axios.post(
         `${apiUrl}/auth/change-password`,
         { current_password: currentPass, new_password: newPass },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
 
       setPassMsg({ type: 'success', text: 'Đổi mật khẩu thành công!' });

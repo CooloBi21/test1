@@ -39,6 +39,7 @@ export default function LoginPage() {
 
       const res = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
@@ -60,7 +61,7 @@ export default function LoginPage() {
         );
       }
 
-      login(data.access_token, data.user);
+      login(data.user);
       redirectByRole(data.user);
     } catch (err: any) {
       setError(err.message);
@@ -153,7 +154,7 @@ export default function LoginPage() {
           <GoogleLoginButton
             text="signin_with"
             onSuccess={(data) => {
-              login(data.access_token, data.user);
+              login(data.user);
               redirectByRole(data.user);
             }}
             onError={(err: any) => {

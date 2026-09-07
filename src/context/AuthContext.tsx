@@ -14,7 +14,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (token: string, user: User) => void;
+  login: (user: User) => void;
   logout: () => void;
 }
 
@@ -25,27 +25,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Tự động khôi phục phiên đăng nhập khi F5
-    const savedToken = localStorage.getItem('access_token');
-    const savedUser = localStorage.getItem('user_info');
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-    }
+    const restoreSession = async () => {
+      try {
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+        const res = await fetch(`${apiUrl}/auth/profile`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (!res.ok) {
+          setUser(null);
+          return;
+        }
+
+        const currentUser = await res.json();
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Không thể khôi phục phiên đăng nhập:', error);
+        setUser(null);
+      }
+    };
+
+    restoreSession();
   }, []);
 
-  const login = (newToken: string, newUser: User) => {
-    setToken(newToken);
+  const login = (newUser: User) => {
     setUser(newUser);
-    localStorage.setItem('access_token', newToken);
-    localStorage.setItem('user_info', JSON.stringify(newUser));
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user_info');
   };
 
   return (
@@ -57,8 +69,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
+
   return context;
 };
