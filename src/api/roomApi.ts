@@ -356,9 +356,7 @@ export const createRoomPost = async (roomData: any): Promise<any> => {
   return response.json();
 };
 
-export const uploadRoomImages = async (files: File[], token?: string): Promise<string[]> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để upload ảnh');
+export const uploadRoomImages = async (files: File[]): Promise<string[]> => {
   if (!files.length) return [];
 
   const formData = new FormData();
@@ -366,9 +364,7 @@ export const uploadRoomImages = async (files: File[], token?: string): Promise<s
 
   const response = await fetch(`${API_URL}/api/rooms/images`, {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-    },
+    credentials: 'include',
     body: formData,
   });
 
