@@ -380,14 +380,13 @@ export const uploadRoomImages = async (files: File[]): Promise<string[]> => {
 export const updateRoomPost = async (
   roomId: number | string,
   roomData: any,
-  token?: string
 ): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để cập nhật bài đăng');
-
   const response = await fetch(`${API_URL}/api/rooms/${roomId}`, {
     method: 'PUT',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(roomData),
   });
 
@@ -464,7 +463,7 @@ export const updateRoomStatus = async (
   return response.json();
 };
 
-// Aliases hỗ trợ linh hoạt cho các tên gọi hàm khác nhau
+// Aliases hỗ trợ linh hoạt cho các tên gọi khác nhau
 export const createRoom = createRoomPost;
 export const updateRoom = updateRoomPost;
 export const deleteRoom = deleteRoomPost;
