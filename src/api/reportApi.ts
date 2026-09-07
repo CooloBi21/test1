@@ -21,7 +21,9 @@ export const createReportApi = async (roomId: number, reason: string) => {
 };
 
 export const getAdminReportsApi = async () => {
-  const res = await axios.get(`${API_URL}/api/reports/admin`, getAuthHeader());
+  const res = await axios.get(`${API_URL}/api/reports/admin`, {
+    withCredentials: true,
+  });
   return res.data;
 };
 
