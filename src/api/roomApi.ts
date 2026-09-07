@@ -400,14 +400,10 @@ export const updateRoomPost = async (
 
 export const deleteRoomPost = async (
   roomId: number | string,
-  token?: string
 ): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để xóa bài đăng');
-
   const response = await fetch(`${API_URL}/api/rooms/${roomId}`, {
     method: 'DELETE',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
   });
 
   if (!response.ok) {
