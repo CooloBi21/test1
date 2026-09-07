@@ -338,13 +338,13 @@ export const deleteReview = async (reviewId: number): Promise<void> => {
    5. ĐĂNG, CẬP NHẬT VÀ XÓA TIN PHÒNG TRỌ (POST / PUT / DELETE ROOM)
    ========================================================================== */
 
-export const createRoomPost = async (roomData: any, token?: string): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để thực hiện chức năng này');
-
+export const createRoomPost = async (roomData: any): Promise<any> => {
   const response = await fetch(`${API_URL}/api/rooms`, {
     method: 'POST',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(roomData),
   });
 
