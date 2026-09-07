@@ -309,13 +309,10 @@ export const replyToReviewAsOwner = async (
   return response.json();
 };
 
-export const getMyReviews = async (token?: string): Promise<any[]> => {
-  const jwt = getToken(token);
-  if (!jwt) return [];
-
+export const getMyReviews = async (): Promise<any[]> => {
   try {
     const response = await fetch(`${API_URL}/api/reviews/my-reviews`, {
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
       cache: 'no-store',
     });
 
