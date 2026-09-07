@@ -15,7 +15,7 @@ interface Room {
 }
 
 export default function AdminRoomsPage() {
-  const { token } = useAuth();
+  const { user } = useAuth();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingId, setLoadingId] = useState<number | null>(null);
@@ -32,7 +32,7 @@ export default function AdminRoomsPage() {
         
         // Gọi endpoint riêng của Admin
         const res = await fetch(`${API_URL}/api/admin/rooms`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          credentials: 'include',
         });
         
         const data = await res.json();
@@ -46,7 +46,7 @@ export default function AdminRoomsPage() {
     };
 
     fetchRooms();
-  }, [token]);
+  }, []);
 
   // Lọc bài đăng theo trạng thái
   const filteredRooms = rooms.filter((room) => {
@@ -73,7 +73,7 @@ export default function AdminRoomsPage() {
   const currentRooms = filteredRooms.slice(startIndex, startIndex + pageSize);
 
   const handleStatusChange = async (id: number, newStatus: 'approved' | 'rejected') => {
-    if (!token) {
+    if (!user) {
       alert('Bạn chưa đăng nhập hoặc không có quyền thực hiện!');
       return;
     }
