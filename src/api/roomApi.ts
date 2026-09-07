@@ -225,16 +225,18 @@ export type ReviewReactionType = 'helpful' | 'like' | 'trusted';
 export const toggleReviewReaction = async (
   reviewId: number | string,
   type: ReviewReactionType,
-  token?: string
 ): Promise<{ reactions?: Record<string, number>; active?: boolean }> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để thực hiện');
-
-  const response = await fetch(`${API_URL}/api/reviews/${reviewId}/reactions`, {
-    method: 'POST',
-    headers: getAuthHeaders(jwt),
-    body: JSON.stringify({ type }),
-  });
+  const response = await fetch(
+    `${API_URL}/api/reviews/${reviewId}/reactions`,
+    {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ type }),
+    },
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
