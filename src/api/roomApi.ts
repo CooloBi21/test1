@@ -291,14 +291,13 @@ export const getRoomReviews = async (
 export const replyToReviewAsOwner = async (
   reviewId: number | string,
   reply: string,
-  token?: string
 ): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để phản hồi đánh giá');
-
   const response = await fetch(`${API_URL}/api/reviews/${reviewId}/owner-reply`, {
     method: 'PATCH',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ reply }),
   });
 
