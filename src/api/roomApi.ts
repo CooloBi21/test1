@@ -414,13 +414,10 @@ export const deleteRoomPost = async (
   return response.json();
 };
 
-export const getMyRooms = async (token?: string): Promise<Room[]> => {
-  const jwt = getToken(token);
-  if (!jwt) return [];
-
+export const getMyRooms = async (): Promise<Room[]> => {
   try {
     const response = await fetch(`${API_URL}/api/rooms/my-rooms`, {
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
       cache: 'no-store',
     });
 
