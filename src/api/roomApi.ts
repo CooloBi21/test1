@@ -323,14 +323,11 @@ export const getMyReviews = async (): Promise<any[]> => {
   }
 };
 
-export const deleteReview = async (reviewId: number, token?: string): Promise<void> => {
-  const jwt = getToken(token);
-  if (!jwt) return;
-
+export const deleteReview = async (reviewId: number): Promise<void> => {
   try {
     await fetch(`${API_URL}/api/reviews/${reviewId}`, {
       method: 'DELETE',
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
     });
   } catch (error) {
     console.error('Lỗi xóa đánh giá:', error);
