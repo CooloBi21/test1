@@ -248,14 +248,13 @@ export const toggleReviewReaction = async (
 
 export const submitReview = async (
   data: { room_id: number; rating: number; comment?: string; images?: string[] },
-  token?: string
 ): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để gửi đánh giá');
-
   const response = await fetch(`${API_URL}/api/reviews`, {
     method: 'POST',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(data),
   });
 
