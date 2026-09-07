@@ -68,7 +68,7 @@ export default function AdminReportsPage() {
     if (!confirm('Bạn có chắc muốn khóa bài đăng này do vi phạm?')) return;
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') || '' : '';
-      await updateRoomStatus(roomId, 'rejected', token);
+      await updateRoomStatus(roomId, 'rejected');
       await updateReportStatusApi(reportId, 'resolved');
       alert('Đã khóa bài viết thành công!');
       await fetchReports();

@@ -437,14 +437,13 @@ export const getMyRooms = async (): Promise<Room[]> => {
 export const updateRoomStatus = async (
   id: number | string,
   status: 'approved' | 'rejected',
-  token?: string
 ): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập với quyền Admin để thực hiện');
-
   const response = await fetch(`${API_URL}/api/admin/rooms/${id}/status`, {
     method: 'PUT',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ status }),
   });
 

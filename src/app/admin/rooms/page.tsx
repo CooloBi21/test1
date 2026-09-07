@@ -80,7 +80,7 @@ export default function AdminRoomsPage() {
 
     setLoadingId(id);
     try {
-      await updateRoomStatus(id, newStatus, token);
+      await updateRoomStatus(id, newStatus);
       
       setRooms((prev) =>
         prev.map((room) => (room.id === id ? { ...room, status: newStatus } : room))
