@@ -30,10 +30,15 @@ export default function SupportPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return alert('Vui lòng nhập nội dung hỗ trợ');
-    const token = localStorage.getItem('access_token');
-    await axios.post('http://localhost:5000/api/support-tickets', { category, message }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+
+    await axios.post(
+      'http://localhost:5000/api/support-tickets',
+      { category, message },
+      {
+        withCredentials: true,
+      },
+    );
+
     alert('Đã gửi yêu cầu trợ giúp thành công!');
     setMessage('');
     fetchMyTickets();
