@@ -122,13 +122,12 @@ export default function AdminUsersPage() {
     if (!banModal.user) return;
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : '';
       const res = await fetch(`${apiUrl}/api/admin/users/${banModal.user.id}/ban`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ reason: banModal.reason }),
       });
 
