@@ -2,47 +2,6 @@ import { Room, RoomFilterParams } from '@/types/room';
 
 const API_URL: string = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-/**
- * Helper lấy token thông minh (Quét tất cả các key lưu trữ phổ biến)
- */
-const getToken = (token?: string): string | null => {
-  if (token) return token;
-  if (typeof window === 'undefined') return null;
-
-  // 1. Kiểm tra các key chuỗi token trực tiếp
-  const directToken =
-    localStorage.getItem('token') ||
-    localStorage.getItem('access_token') ||
-    localStorage.getItem('accessToken') ||
-    localStorage.getItem('auth_token');
-
-  if (directToken) return directToken;
-
-  // 2. Kiểm tra nếu token nằm bọc bên trong object 'user' hoặc 'auth'
-  try {
-    const userStr = localStorage.getItem('user') || localStorage.getItem('auth');
-    if (userStr) {
-      const parsed = JSON.parse(userStr);
-      return parsed.token || parsed.access_token || parsed.accessToken || null;
-    }
-  } catch {
-    // Bỏ qua nếu parse JSON thất bại
-  }
-
-  return null;
-};
-
-/**
- * Helper lấy Auth Header chứa Token cho fetch API
- */
-const getAuthHeaders = (token?: string): HeadersInit => {
-  const jwt = getToken(token);
-  return {
-    'Content-Type': 'application/json',
-    ...(jwt ? { Authorization: `Bearer ${jwt}` } : {}),
-  };
-};
-
 /* ==========================================================================
    1. QUẢN LÝ PHÒNG TRỌ (ROOMS)
    ========================================================================== */
