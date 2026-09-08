@@ -39,13 +39,12 @@ export default function AdminUsersPage() {
     try {
       setLoading(true);
       setError(null);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : '';
 
       const res = await fetch(`${apiUrl}/api/admin/users`, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
       });
 
       if (!res.ok) {
