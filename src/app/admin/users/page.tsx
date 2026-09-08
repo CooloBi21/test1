@@ -146,13 +146,12 @@ export default function AdminUsersPage() {
     if (!confirm('Xác nhận mở khóa tài khoản này?')) return;
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : '';
       const res = await fetch(`${apiUrl}/api/admin/users/${id}/unban`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
       });
 
       if (!res.ok) {
