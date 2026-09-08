@@ -2,15 +2,6 @@ import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-const getAuthHeader = () => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
-
 export const createReportApi = async (roomId: number, reason: string) => {
   const res = await axios.post(
     `${API_URL}/api/reports`,
