@@ -41,7 +41,6 @@ export default function AdminSupportPage() {
 
   const handleSendReply = async () => {
     try {
-      const token = localStorage.getItem('access_token');
       await axios.patch(
         `${API_URL}/api/support-tickets/admin/${replyModal.ticket.id}`,
         {
@@ -49,7 +48,7 @@ export default function AdminSupportPage() {
           status: 'resolved',
         },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         },
       );
       setReplyModal({ open: false, ticket: null, reply: '' });
