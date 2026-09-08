@@ -92,13 +92,12 @@ export default function AdminUsersPage() {
     }
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : '';
       const res = await fetch(`${apiUrl}/api/admin/users/${targetUser.id}/role`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ role: newRole }),
       });
 
