@@ -20,7 +20,7 @@ export default function SupportPage() {
     const token = localStorage.getItem('access_token');
     if (!token) return;
     const res = await axios.get('http://localhost:5000/api/support-tickets/my-tickets', {
-      headers: { Authorization: `Bearer ${token}` },
+      withCredentials: true,
     });
     setTickets(res.data);
   };
