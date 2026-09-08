@@ -36,7 +36,9 @@ export const updateReportStatusApi = async (
   const res = await axios.patch(
     `${API_URL}/api/reports/admin/${reportId}/status`,
     { status },
-    getAuthHeader()
+    {
+      withCredentials: true,
+    }
   );
   return res.data;
 };
