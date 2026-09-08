@@ -15,7 +15,9 @@ export const createReportApi = async (roomId: number, reason: string) => {
   const res = await axios.post(
     `${API_URL}/api/reports`,
     { room_id: roomId, reason },
-    getAuthHeader()
+    {
+      withCredentials: true,
+    }
   );
   return res.data;
 };
