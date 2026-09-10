@@ -1,3 +1,5 @@
+process.loadEnvFile('.env.local');
+
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
