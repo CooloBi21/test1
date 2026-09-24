@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 const CATEGORY_MAP: Record<string, string> = {
   account_issue: 'Vấn đề tài khoản (Khóa/Thông tin)',
   room_issue: 'Bài đăng bị xóa/từ chối',
@@ -17,9 +19,7 @@ export default function SupportPage() {
   const [tickets, setTickets] = useState<any[]>([]);
 
   const fetchMyTickets = async () => {
-    const token = localStorage.getItem('access_token');
-    if (!token) return;
-    const res = await axios.get('http://localhost:5000/api/support-tickets/my-tickets', {
+    const res = await axios.get(`${API_URL}/api/support-tickets/my-tickets`, {
       withCredentials: true,
     });
     setTickets(res.data);
@@ -32,7 +32,7 @@ export default function SupportPage() {
     if (!message.trim()) return alert('Vui lòng nhập nội dung hỗ trợ');
 
     await axios.post(
-      'http://localhost:5000/api/support-tickets',
+      `${API_URL}/api/support-tickets`,
       { category, message },
       {
         withCredentials: true,
