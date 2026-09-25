@@ -2,47 +2,6 @@ import { Room, RoomFilterParams } from '@/types/room';
 
 const API_URL: string = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-/**
- * Helper lấy token thông minh (Quét tất cả các key lưu trữ phổ biến)
- */
-const getToken = (token?: string): string | null => {
-  if (token) return token;
-  if (typeof window === 'undefined') return null;
-
-  // 1. Kiểm tra các key chuỗi token trực tiếp
-  const directToken =
-    localStorage.getItem('token') ||
-    localStorage.getItem('access_token') ||
-    localStorage.getItem('accessToken') ||
-    localStorage.getItem('auth_token');
-
-  if (directToken) return directToken;
-
-  // 2. Kiểm tra nếu token nằm bọc bên trong object 'user' hoặc 'auth'
-  try {
-    const userStr = localStorage.getItem('user') || localStorage.getItem('auth');
-    if (userStr) {
-      const parsed = JSON.parse(userStr);
-      return parsed.token || parsed.access_token || parsed.accessToken || null;
-    }
-  } catch {
-    // Bỏ qua nếu parse JSON thất bại
-  }
-
-  return null;
-};
-
-/**
- * Helper lấy Auth Header chứa Token cho fetch API
- */
-const getAuthHeaders = (token?: string): HeadersInit => {
-  const jwt = getToken(token);
-  return {
-    'Content-Type': 'application/json',
-    ...(jwt ? { Authorization: `Bearer ${jwt}` } : {}),
-  };
-};
-
 /* ==========================================================================
    1. QUẢN LÝ PHÒNG TRỌ (ROOMS)
    ========================================================================== */
@@ -62,7 +21,7 @@ export const getRooms = async (params: RoomFilterParams = {}): Promise<Room[]> =
 
     if (!response.ok) return [];
     const result = await response.json();
-    
+
     // Tự động giải bọc nếu backend trả về { total, data } hoặc array thuần
     if (result && Array.isArray(result.data)) {
       return result.data;
@@ -89,48 +48,58 @@ export const getRoomById = async (id: number | string): Promise<Room | null> => 
    2. TIN ĐÃ LƯU (SAVED POSTS)
    ========================================================================== */
 
-export const toggleSavePost = async (roomId: number, token?: string): Promise<{ saved: boolean }> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để thực hiện chức năng này');
-
+export const toggleSavePost = async (
+  roomId: number,
+): Promise<{ saved: boolean }> => {
   const response = await fetch(`${API_URL}/api/saved-posts`, {
     method: 'POST',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ room_id: roomId }),
   });
 
-  if (!response.ok) throw new Error('Thao tác lưu bài viết thất bại');
+  if (!response.ok) {
+    throw new Error('Thao tác lưu bài viết thất bại');
+  }
+
   return response.json();
 };
 
-export const checkIsSaved = async (roomId: number, token?: string): Promise<boolean> => {
-  const jwt = getToken(token);
-  if (!jwt) return false;
-
+export const checkIsSaved = async (roomId: number): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_URL}/api/saved-posts/check/${roomId}`, {
-      headers: getAuthHeaders(jwt),
-      cache: 'no-store',
-    });
+    const response = await fetch(
+      `${API_URL}/api/saved-posts/check/${roomId}`,
+      {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+      },
+    );
 
     if (!response.ok) return false;
+
     return await response.json();
   } catch {
     return false;
   }
 };
 
-export const getSavedPosts = async (token?: string): Promise<any[]> => {
-  const jwt = getToken(token);
-  if (!jwt) return [];
-
+export const getSavedPosts = async (): Promise<any[]> => {
   try {
     const response = await fetch(`${API_URL}/api/saved-posts`, {
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       cache: 'no-store',
     });
 
     if (!response.ok) return [];
+
     const data = await response.json();
     return Array.isArray(data) ? data : [];
   } catch (error) {
@@ -143,14 +112,14 @@ export const getSavedPosts = async (token?: string): Promise<any[]> => {
    3. LỊCH SỬ XEM (ROOM VIEWS)
    ========================================================================== */
 
-export const recordRoomView = async (roomId: number, token?: string): Promise<void> => {
-  const jwt = getToken(token);
-  if (!jwt) return;
-
+export const recordRoomView = async (roomId: number): Promise<void> => {
   try {
     await fetch(`${API_URL}/api/room-views`, {
       method: 'POST',
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ room_id: roomId }),
     });
   } catch (error) {
@@ -158,17 +127,18 @@ export const recordRoomView = async (roomId: number, token?: string): Promise<vo
   }
 };
 
-export const getViewHistory = async (token?: string): Promise<any[]> => {
-  const jwt = getToken(token);
-  if (!jwt) return [];
-
+export const getViewHistory = async (): Promise<any[]> => {
   try {
     const response = await fetch(`${API_URL}/api/room-views`, {
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       cache: 'no-store',
     });
 
     if (!response.ok) return [];
+
     const data = await response.json();
     return Array.isArray(data) ? data : [];
   } catch (error) {
@@ -177,28 +147,28 @@ export const getViewHistory = async (token?: string): Promise<any[]> => {
   }
 };
 
-export const deleteHistoryItem = async (roomId: number, token?: string): Promise<void> => {
-  const jwt = getToken(token);
-  if (!jwt) return;
-
+export const deleteHistoryItem = async (roomId: number): Promise<void> => {
   try {
     await fetch(`${API_URL}/api/room-views/${roomId}`, {
       method: 'DELETE',
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
   } catch (error) {
     console.error('Lỗi xóa lịch sử:', error);
   }
 };
 
-export const clearAllHistory = async (token?: string): Promise<void> => {
-  const jwt = getToken(token);
-  if (!jwt) return;
-
+export const clearAllHistory = async (): Promise<void> => {
   try {
     await fetch(`${API_URL}/api/room-views`, {
       method: 'DELETE',
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
   } catch (error) {
     console.error('Lỗi xóa toàn bộ lịch sử:', error);
@@ -214,16 +184,18 @@ export type ReviewReactionType = 'helpful' | 'like' | 'trusted';
 export const toggleReviewReaction = async (
   reviewId: number | string,
   type: ReviewReactionType,
-  token?: string
 ): Promise<{ reactions?: Record<string, number>; active?: boolean }> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để thực hiện');
-
-  const response = await fetch(`${API_URL}/api/reviews/${reviewId}/reactions`, {
-    method: 'POST',
-    headers: getAuthHeaders(jwt),
-    body: JSON.stringify({ type }),
-  });
+  const response = await fetch(
+    `${API_URL}/api/reviews/${reviewId}/reactions`,
+    {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ type }),
+    },
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -235,14 +207,13 @@ export const toggleReviewReaction = async (
 
 export const submitReview = async (
   data: { room_id: number; rating: number; comment?: string; images?: string[] },
-  token?: string
 ): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để gửi đánh giá');
-
   const response = await fetch(`${API_URL}/api/reviews`, {
     method: 'POST',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(data),
   });
 
@@ -279,14 +250,13 @@ export const getRoomReviews = async (
 export const replyToReviewAsOwner = async (
   reviewId: number | string,
   reply: string,
-  token?: string
 ): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để phản hồi đánh giá');
-
   const response = await fetch(`${API_URL}/api/reviews/${reviewId}/owner-reply`, {
     method: 'PATCH',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ reply }),
   });
 
@@ -298,13 +268,10 @@ export const replyToReviewAsOwner = async (
   return response.json();
 };
 
-export const getMyReviews = async (token?: string): Promise<any[]> => {
-  const jwt = getToken(token);
-  if (!jwt) return [];
-
+export const getMyReviews = async (): Promise<any[]> => {
   try {
     const response = await fetch(`${API_URL}/api/reviews/my-reviews`, {
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
       cache: 'no-store',
     });
 
@@ -315,14 +282,11 @@ export const getMyReviews = async (token?: string): Promise<any[]> => {
   }
 };
 
-export const deleteReview = async (reviewId: number, token?: string): Promise<void> => {
-  const jwt = getToken(token);
-  if (!jwt) return;
-
+export const deleteReview = async (reviewId: number): Promise<void> => {
   try {
     await fetch(`${API_URL}/api/reviews/${reviewId}`, {
       method: 'DELETE',
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
     });
   } catch (error) {
     console.error('Lỗi xóa đánh giá:', error);
@@ -333,13 +297,13 @@ export const deleteReview = async (reviewId: number, token?: string): Promise<vo
    5. ĐĂNG, CẬP NHẬT VÀ XÓA TIN PHÒNG TRỌ (POST / PUT / DELETE ROOM)
    ========================================================================== */
 
-export const createRoomPost = async (roomData: any, token?: string): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để thực hiện chức năng này');
-
+export const createRoomPost = async (roomData: any): Promise<any> => {
   const response = await fetch(`${API_URL}/api/rooms`, {
     method: 'POST',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(roomData),
   });
 
@@ -347,13 +311,11 @@ export const createRoomPost = async (roomData: any, token?: string): Promise<any
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || 'Đăng tin thất bại. Vui lòng thử lại.');
   }
-  
+
   return response.json();
 };
 
-export const uploadRoomImages = async (files: File[], token?: string): Promise<string[]> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để upload ảnh');
+export const uploadRoomImages = async (files: File[]): Promise<string[]> => {
   if (!files.length) return [];
 
   const formData = new FormData();
@@ -361,9 +323,7 @@ export const uploadRoomImages = async (files: File[], token?: string): Promise<s
 
   const response = await fetch(`${API_URL}/api/rooms/images`, {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-    },
+    credentials: 'include',
     body: formData,
   });
 
@@ -379,14 +339,13 @@ export const uploadRoomImages = async (files: File[], token?: string): Promise<s
 export const updateRoomPost = async (
   roomId: number | string,
   roomData: any,
-  token?: string
 ): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để cập nhật bài đăng');
-
   const response = await fetch(`${API_URL}/api/rooms/${roomId}`, {
     method: 'PUT',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(roomData),
   });
 
@@ -400,14 +359,10 @@ export const updateRoomPost = async (
 
 export const deleteRoomPost = async (
   roomId: number | string,
-  token?: string
 ): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập để xóa bài đăng');
-
   const response = await fetch(`${API_URL}/api/rooms/${roomId}`, {
     method: 'DELETE',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -418,13 +373,10 @@ export const deleteRoomPost = async (
   return response.json();
 };
 
-export const getMyRooms = async (token?: string): Promise<Room[]> => {
-  const jwt = getToken(token);
-  if (!jwt) return [];
-
+export const getMyRooms = async (): Promise<Room[]> => {
   try {
     const response = await fetch(`${API_URL}/api/rooms/my-rooms`, {
-      headers: getAuthHeaders(jwt),
+      credentials: 'include',
       cache: 'no-store',
     });
 
@@ -444,14 +396,13 @@ export const getMyRooms = async (token?: string): Promise<Room[]> => {
 export const updateRoomStatus = async (
   id: number | string,
   status: 'approved' | 'rejected',
-  token?: string
 ): Promise<any> => {
-  const jwt = getToken(token);
-  if (!jwt) throw new Error('Vui lòng đăng nhập với quyền Admin để thực hiện');
-
   const response = await fetch(`${API_URL}/api/admin/rooms/${id}/status`, {
     method: 'PUT',
-    headers: getAuthHeaders(jwt),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ status }),
   });
 
@@ -463,7 +414,7 @@ export const updateRoomStatus = async (
   return response.json();
 };
 
-// Aliases hỗ trợ linh hoạt cho các tên gọi hàm khác nhau
+// Aliases hỗ trợ linh hoạt cho các tên gọi khác nhau
 export const createRoom = createRoomPost;
 export const updateRoom = updateRoomPost;
 export const deleteRoom = deleteRoomPost;

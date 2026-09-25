@@ -21,10 +21,11 @@ export default function AdminSupportPage() {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('access_token');
+
       const res = await axios.get(`${API_URL}/api/support-tickets/admin`, {
-        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
       });
+
       setTickets(Array.isArray(res.data) ? res.data : []);
     } catch (err: any) {
       console.error('Lỗi khi tải danh sách ticket hỗ trợ:', err);
@@ -40,7 +41,6 @@ export default function AdminSupportPage() {
 
   const handleSendReply = async () => {
     try {
-      const token = localStorage.getItem('access_token');
       await axios.patch(
         `${API_URL}/api/support-tickets/admin/${replyModal.ticket.id}`,
         {
@@ -48,7 +48,7 @@ export default function AdminSupportPage() {
           status: 'resolved',
         },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         },
       );
       setReplyModal({ open: false, ticket: null, reply: '' });

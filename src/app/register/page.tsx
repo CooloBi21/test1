@@ -324,7 +324,7 @@ export default function RegisterPage() {
           <GoogleLoginButton
             text="signup_with"
             onSuccess={(data) => {
-              login(data.access_token, data.user);
+              login(data.user);
               router.push('/');
             }}
             onError={(err) => {

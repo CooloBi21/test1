@@ -39,13 +39,12 @@ export default function AdminUsersPage() {
     try {
       setLoading(true);
       setError(null);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : '';
 
       const res = await fetch(`${apiUrl}/api/admin/users`, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
       });
 
       if (!res.ok) {
@@ -93,13 +92,12 @@ export default function AdminUsersPage() {
     }
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : '';
       const res = await fetch(`${apiUrl}/api/admin/users/${targetUser.id}/role`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ role: newRole }),
       });
 
@@ -124,13 +122,12 @@ export default function AdminUsersPage() {
     if (!banModal.user) return;
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : '';
       const res = await fetch(`${apiUrl}/api/admin/users/${banModal.user.id}/ban`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ reason: banModal.reason }),
       });
 
@@ -149,13 +146,12 @@ export default function AdminUsersPage() {
     if (!confirm('Xác nhận mở khóa tài khoản này?')) return;
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : '';
       const res = await fetch(`${apiUrl}/api/admin/users/${id}/unban`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
       });
 
       if (!res.ok) {
